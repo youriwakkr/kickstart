@@ -1,0 +1,8 @@
+baseUrl: $PRIMARY_SITE_URL
+handle: default
+hasUrls: true
+language: en
+name: craftcmstest
+primary: true
+siteGroup: 1315f0d3-39d5-4db8-82fe-75feb6a29ee3 # craftcmstest
+sortOrder: 1
