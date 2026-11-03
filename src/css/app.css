@@ -2,8 +2,7 @@
 @import "tailwindcss";
 
 /* Point Tailwind to your Craft CMS Twig templates */
-@source "../../templates/**/*.twig";
-@source "../../templates/**/*.html";
+@source "../../templates/**/*.{twig,html}";
 
 * {
   margin: 0;
