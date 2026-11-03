@@ -1,0 +1,30 @@
+{% import '_macros/picture.twig' as ui %}
+
+{# Full width hero banner #}
+{# Loading: eager - For important priority images #}
+{{ ui.picture({
+  image: entry.heroImage.one(),
+  widths: [400, 800, 1200, 1600, 2000],
+  sizes: '100vw',
+  ratio: '21/9',
+  class: 'w-full h-full object-cover',
+  loading: 'eager'
+}) }}
+
+{# Two column layout grid #}
+{{ ui.picture({
+  image: entry.heroImage.one(),
+  widths: [400, 640, 960, 1280],
+  sizes: '(min-width: 1280px) 640px, (min-width: 768px) 50vw, 100vw',
+  ratio: '16/9',
+  class: 'w-full h-auto object-cover',
+}) }}
+
+{# Three column layout grid #}
+{{ ui.picture({
+  image: entry.cardImage.one(),
+  widths: [380, 500, 760, 1000, 1260],
+  sizes: '(min-width: 1280px) 420px, (min-width: 1024px) 33.33vw, (min-width: 768px) 50vw, 100vw',
+  ratio: '16/9',
+  class: 'w-full h-auto object-cover'
+}) }}

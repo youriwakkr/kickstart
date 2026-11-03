@@ -1,0 +1,12 @@
+/* src/css/app.css */
+@import "tailwindcss";
+
+/* Point Tailwind to your Craft CMS Twig templates */
+@source "../../templates/**/*.twig";
+@source "../../templates/**/*.html";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

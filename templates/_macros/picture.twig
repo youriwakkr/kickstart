@@ -1,0 +1,97 @@
+{#
+  templates/_macros/image.twig
+  
+  Renders an accessible, modern, multi-format <picture> element.
+  
+  Expected params object:
+  - image: (Asset) Craft Asset object [Required]
+  - widths: (Array) Array of integer pixel widths, e.g. [400, 800, 1200]
+  - sizes: (String) CSS sizes attribute, e.g. '(min-width: 1024px) 33vw, 100vw'
+  - ratio: (String) Aspect ratio formatted as 'W/H', e.g. '16/9' or '1/1' (Optional)
+  - class: (String) CSS classes applied to the fallback <img> tag
+  - loading: (String) 'lazy' (default) or 'eager' (for above-the-fold/LCP images)
+
+    Combining these sizes to Tailwind: 
+
+    Full Width Image:
+    sizes: '100vw'
+    (1260 x 1 = 1260)
+    widths: [400, 800, 1200, 1600, 2000]
+
+    2-Column Grid:
+    sizes: '(min-width: 1280px) 640px, (min-width: 768px) 50vw, 100vw'
+    (640 x 2 = 1280)
+    widths: [400, 640, 960, 1280]
+
+
+    3-Column Grid:
+    sizes: '(min-width: 1280px) 420px, (min-width: 1024px) 33.33vw, (min-width: 768px) 50vw, 100vw'
+
+    Recommended width descriptors:
+    (420 x 3 = 1260)
+    widths: [380, 500, 760, 1000, 1260]
+
+#}
+{% macro picture(params) %}
+  {% set image = params.image ?? null %}
+  {% if not image %}
+    {% exit %}
+  {% endif %}
+
+  {# Defaults #}
+  {% set widths = params.widths ?? [400, 800, 1200] %}
+  {% set sizes = params.sizes ?? '100vw' %}
+  {% set ratio = params.ratio ?? null %}
+  {% set class = params.class ?? '' %}
+  {% set loading = params.loading ?? 'lazy' %}
+
+  {# Format integer array into Craft-compatible width descriptors (e.g. ['400w', '800w']) #}
+  {% set targetWidths = [] %}
+  {% for w in widths %}
+    {% set targetWidths = targetWidths|merge([w ~ 'w']) %}
+  {% endfor %}
+
+  {# Base transform options #}
+  {% set baseTransform = { mode: 'crop' } %}
+  {% if ratio %}
+    {% set baseTransform = baseTransform|merge({ ratio: ratio }) %}
+  {% endif %}
+
+  {# Compute intrinsic fallback dimensions to prevent CLS #}
+  {% set fallbackWidth = widths|first %}
+  {% set fallbackTransform = baseTransform|merge({ width: fallbackWidth }) %}
+  
+  {% if ratio %}
+    {% set ratioParts = ratio|split('/') %}
+    {% set fallbackHeight = (fallbackWidth / (ratioParts[0] / ratioParts[1]))|round %}
+  {% else %}
+    {% set fallbackHeight = image.getHeight(fallbackTransform) %}
+  {% endif %}
+
+  <picture>
+    {# 1. AVIF variant (Best compression for supported modern browsers) #}
+    <source 
+      type="image/avif" 
+      srcset="{{ image.getSrcset(targetWidths, baseTransform|merge({ format: 'avif' })) }}" 
+      sizes="{{ sizes }}"
+    >
+
+    {# 2. WebP variant (Universal modern browser fallback) #}
+    <source 
+      type="image/webp" 
+      srcset="{{ image.getSrcset(targetWidths, baseTransform|merge({ format: 'webp' })) }}" 
+      sizes="{{ sizes }}"
+    >
+
+    {# 3. Native fallback <img> with intrinsic layout reservation #}
+    <img 
+      src="{{ image.getUrl(fallbackTransform) }}"
+      width="{{ fallbackWidth }}"
+      height="{{ fallbackHeight }}"
+      alt="{{ image.altText ?? image.title }}"
+      class="{{ class }}"
+      loading="{{ loading }}"
+      decoding="async"
+    >
+  </picture>
+{% endmacro %}

@@ -1,18 +1,34 @@
-dateModified: 1793609528
+dateModified: 1793702802
 email:
   fromEmail: admin@wakkr.com
   fromName: craftcmstest
   transportType: craft\mail\transportadapters\Sendmail
+fs:
+  localUploads:
+    hasUrls: true
+    name: 'Local uploads'
+    settings:
+      path: '@webroot/uploads'
+    type: craft\fs\Local
+    url: $PRIMARY_SITE_UPLOADS_URL
 meta:
   __names__:
     5d562239-c045-4b64-becc-2660b279bd2d: craftcmstest # craftcmstest
     1315f0d3-39d5-4db8-82fe-75feb6a29ee3: craftcmstest # craftcmstest
+    bb3d5734-fed6-44a9-94b6-c2a5710980fa: English # English
+    fdaca0fe-0ab7-47b3-82c1-ce23d13b606f: 'Images volume' # Images volume
+plugins:
+  vite:
+    edition: standard
+    enabled: true
+    schemaVersion: 1.0.0
 system:
   edition: solo
   live: true
-  name: craftcmstest
+  name: 'Craft Test'
+  retryDuration: null
   schemaVersion: 5.11.0.2
-  timeZone: America/Los_Angeles
+  timeZone: Europe/Amsterdam
 users:
   allowPublicRegistration: false
   defaultGroup: null

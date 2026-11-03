@@ -7,13 +7,28 @@ xdebug_enabled: false
 additional_hostnames: []
 additional_fqdns: []
 database:
-    type: mysql
-    version: "8.0"
+  type: mysql
+  version: "8.0"
 use_dns_when_possible: true
 composer_version: "2"
 web_environment: []
 nodejs_version: "24"
 corepack_enable: false
+web_extra_exposed_ports:
+  - name: vite
+    container_port: 3000
+    http_port: 3000
+    https_port: 3001
+web_extra_daemons:
+  # Run Vite in a separate process
+  - name: "vite"
+    command: "npm install && npm run dev"
+    directory: /var/www/html
+hooks:
+  post-start:
+    - composer: install # Keeps installed packages up to date
+    - exec: ./craft up # Apply migrations & project config changes
+
 
 # Key features of DDEV's config.yaml:
 
