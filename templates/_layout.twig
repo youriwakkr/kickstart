@@ -8,9 +8,25 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <meta name="referrer" content="origin-when-cross-origin"/>
+
+    {% if entry is defined and entry %}
+      {% for site in craft.app.sites.getAllSites() %}
+        {% set localizedEntry = craft.entries()
+      .id(entry.id)
+      .siteId(site.id)
+      .status(null)
+      .one() %}
+
+        {% if localizedEntry and localizedEntry.enabled and localizedEntry.enabledForSite %}
+          <link rel="alternate" hreflang="{{ site.language }}" href="{{ localizedEntry.getUrl() }}"/>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
     <title>{{ siteName }}</title>
 
-    {# Vite #} {{ craft.vite.script('src/js/app.js') }}
+    {# Vite #}
+    {{ craft.vite.script('src/js/app.js') }}
   </head>
   <body class="ltr">
     <header class="flex items-center justify-between px-6 py-4 border-b">

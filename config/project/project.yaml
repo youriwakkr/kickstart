@@ -1,4 +1,4 @@
-dateModified: 1793702802
+dateModified: 1793712341
 email:
   fromEmail: admin@wakkr.com
   fromName: craftcmstest
@@ -16,6 +16,7 @@ meta:
     5d562239-c045-4b64-becc-2660b279bd2d: craftcmstest # craftcmstest
     1315f0d3-39d5-4db8-82fe-75feb6a29ee3: craftcmstest # craftcmstest
     bb3d5734-fed6-44a9-94b6-c2a5710980fa: English # English
+    c96be51f-6b8b-45fd-89f5-eb64e887af3f: 'Public Schema' # Public Schema
     fdaca0fe-0ab7-47b3-82c1-ce23d13b606f: 'Images volume' # Images volume
 plugins:
   vite:
@@ -33,6 +34,6 @@ users:
   allowPublicRegistration: false
   defaultGroup: null
   photoSubpath: null
-  photoVolumeUid: null
+  photoVolumeUid: fdaca0fe-0ab7-47b3-82c1-ce23d13b606f # Images volume
   require2fa: false
   requireEmailVerification: true
