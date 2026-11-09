@@ -1,4 +1,4 @@
-dateModified: 1793712341
+dateModified: 1794234068
 email:
   fromEmail: admin@wakkr.com
   fromName: craftcmstest
@@ -13,7 +13,8 @@ fs:
     url: $PRIMARY_SITE_UPLOADS_URL
 meta:
   __names__:
-    5d562239-c045-4b64-becc-2660b279bd2d: craftcmstest # craftcmstest
+    1b7f2dbe-a8a7-485b-80e5-5391ada8b97f: 'Blog tags' # Blog tags
+    5d562239-c045-4b64-becc-2660b279bd2d: Nederlands # Nederlands
     1315f0d3-39d5-4db8-82fe-75feb6a29ee3: craftcmstest # craftcmstest
     bb3d5734-fed6-44a9-94b6-c2a5710980fa: English # English
     c96be51f-6b8b-45fd-89f5-eb64e887af3f: 'Public Schema' # Public Schema
@@ -26,7 +27,7 @@ plugins:
 system:
   edition: solo
   live: true
-  name: 'Craft Test'
+  name: 'Craft Test CMS'
   retryDuration: null
   schemaVersion: 5.11.0.2
   timeZone: Europe/Amsterdam

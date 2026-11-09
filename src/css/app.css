@@ -3,9 +3,3 @@
 
 /* Point Tailwind to your Craft CMS Twig templates */
 @source "../../templates/**/*.{twig,html}";
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}

@@ -1,0 +1,98 @@
+{% extends '_layouts/_layout.twig' %}
+
+{% block title %}{{ entry.title ?? 'Blogs' }} | Youri Gruiters Photography{% endblock %}
+
+{% block content %}
+
+    <div class="mb-14 pb-8 border-b border-zinc-200">
+        <div class="max-w-2xl">
+            <p class="text-xs uppercase tracking-widest font-semibold text-zinc-400">Field Notes & Essays</p>
+            <h1 class="text-3xl sm:text-4xl font-light text-zinc-900 tracking-tight mt-1">
+                {{ entry.title ?? 'Blogs' }}
+            </h1>
+            <p class="mt-3 text-base text-zinc-500 font-light leading-relaxed">
+                Reflections on natural light, camera mechanics, travel essays, and project monographs.
+            </p>
+        </div>
+    </div>
+
+    {% paginate craft.entries().section('blogEntries').limit(2) as pageInfo, pageEntries %}
+
+    <div class="space-y-20">
+        {% for blog in pageEntries %}
+            {% set blogImg = blog.image.one() ?? null %}
+            <article class="grid grid-cols-1 md:grid-cols-12 gap-10 items-center border-b border-zinc-100 pb-20">
+                <div class="md:col-span-6 aspect-[16/10] overflow-hidden rounded-xl bg-zinc-100 shadow-sm">
+                    {% if blogImg %}
+                        <a href="{{ blog.url }}">
+                            <img
+                                src="{{ blogImg.url }}"
+                                alt="{{ blogImg.alt ?? blogImg.title ?? blog.title }}"
+                                class="w-full h-full object-cover hover:scale-102 transition-transform duration-500"
+                            />
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="md:col-span-6 space-y-4">
+                    <div class="text-xs text-zinc-400 uppercase tracking-wider">
+                        {{ blog.postDate ? blog.postDate|date('F d, Y') : '' }}
+                    </div>
+                    <h2 class="text-2xl font-light text-zinc-900 hover:text-zinc-600 transition-colors">
+                        <a href="{{ blog.url }}">
+                            {{ blog.title }}
+                        </a>
+                    </h2>
+                    {% if blog.paragraphs %}
+                        <p class="text-base text-zinc-500 font-light leading-relaxed">
+                            {{ blog.paragraphs|striptags|truncate(200) }}
+                        </p>
+                    {% endif %}
+                    <div class="pt-2">
+                        <a href="{{ blog.url }}" class="text-xs uppercase tracking-widest font-semibold text-zinc-900 border-b border-zinc-900 pb-0.5 hover:text-zinc-600 hover:border-zinc-400 transition-colors">
+                            Read Entry &rarr;
+                        </a>
+                    </div>
+                </div>
+            </article>
+        {% else %}
+            <p class="text-zinc-500">No blog entries found.</p>
+        {% endfor %}
+    </div>
+
+    {% if pageInfo.totalPages > 1 %}
+        <nav class="mt-20 pt-8 border-t border-zinc-200 flex items-center justify-between text-xs uppercase tracking-widest" aria-label="Pagination">
+            {% if pageInfo.prevUrl %}
+                <a href="{{ pageInfo.prevUrl }}" class="text-zinc-900 hover:text-zinc-500 transition-colors font-medium">
+                    &larr; Previous
+                </a>
+            {% else %}
+                <span class="text-zinc-300 cursor-not-allowed">
+                    &larr; Previous
+                </span>
+            {% endif %}
+
+            <div class="flex items-center gap-6">
+                {% for page, url in pageInfo.getPrevUrls(3) %}
+                    <a href="{{ url }}" class="text-zinc-400 hover:text-zinc-900 transition-colors pb-0.5">{{ '%02d'|format(page) }}</a>
+                {% endfor %}
+
+                <span class="text-zinc-900 font-semibold border-b border-zinc-900 pb-0.5">{{ '%02d'|format(pageInfo.currentPage) }}</span>
+
+                {% for page, url in pageInfo.getNextUrls(3) %}
+                    <a href="{{ url }}" class="text-zinc-400 hover:text-zinc-900 transition-colors pb-0.5">{{ '%02d'|format(page) }}</a>
+                {% endfor %}
+            </div>
+
+            {% if pageInfo.nextUrl %}
+                <a href="{{ pageInfo.nextUrl }}" class="text-zinc-900 hover:text-zinc-500 transition-colors font-medium">
+                    Next &rarr;
+                </a>
+            {% else %}
+                <span class="text-zinc-300 cursor-not-allowed">
+                    Next &rarr;
+                </span>
+            {% endif %}
+        </nav>
+    {% endif %}
+
+{% endblock %}

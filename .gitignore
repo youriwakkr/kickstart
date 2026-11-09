@@ -1,8 +1,53 @@
-/.env
-/.idea
-/vendor
+# Environment & Secrets
+.env
+.env.*.local
+.env.local
+
+# Composer & PHP
+/vendor/
+composer.phar
+
+# Craft CMS Storage & Runtime
+/storage/*
+!/storage/.gitkeep
+!/storage/rebrand
+
+# Backups & Database Dumps
+*.sql
+*.sql.gz
+*.tar.gz
+
+# Front-End / Node
+/node_modules/
+/npm-debug.log
+/yarn-error.log
+package-lock.json.bak
+
+# Build Artifacts / Public Web Root
+# Adjust paths if your public directory is `public/` instead of `web/`
+/web/dist/
+/web/assets/
+/web/uploads/
+/web/cpresources/
+!/web/.htaccess
+!/web/index.php
+!/web/robots.txt
+
+# Local Dev Environments (DDEV, Docker, etc.)
+.ddev/.dbimageBuild/
+.ddev/.ddev-docker-compose-base.yaml
+.ddev/.ddev-docker-compose-full.yaml
+.ddev/db_snapshots/
+.ddev/commands/db/restore.sh
+
+# IDEs & System Files
 .DS_Store
-/node_modules
-/web/dist
-package-lock.json
-.pnp.*
+Thumbs.db
+._*
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+.claude/settings.local.json

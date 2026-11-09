@@ -1,8 +1,7 @@
-<nav aria-label="Language selection" class="flex items-center gap-3 text-sm">
+<nav aria-label="Language selection" class="inline-flex items-center gap-2 text-xs tracking-wider uppercase font-medium">
   {% for site in craft.app.sites.getAllSites() %}
     {% set targetUrl = null %}
 
-    {# If the current page is an entry, find its localized peer #}
     {% if entry is defined and entry %}
       {% set localizedEntry = craft.entries()
         .id(entry.id)
@@ -15,29 +14,25 @@
       {% endif %}
     {% endif %}
 
-    {# Fallback to the target site's base URL (e.g. for static routes or missing translations) #}
     {% set targetUrl = targetUrl ?? site.getBaseUrl() %}
     {% set isCurrent = currentSite.handle == site.handle %}
 
     {% if isCurrent %}
-      <span
-        aria-current="page"
-        class="font-semibold text-slate-900 border-b-2 border-slate-900 pb-0.5"
-      >
-        {{ site.name }}
+      <span aria-current="page" class="text-white font-semibold border-b border-white pb-0.5">
+        {{ site.language[:2]|upper }}
       </span>
     {% else %}
       <a
         href="{{ targetUrl }}"
         hreflang="{{ site.language }}"
-        class="text-slate-500 hover:text-slate-900 transition-colors pb-0.5"
+        class="text-zinc-400 hover:text-white transition-colors pb-0.5"
       >
-        {{ site.name }}
+        {{ site.language[:2]|upper }}
       </a>
     {% endif %}
 
     {% if not loop.last %}
-      <span class="text-slate-300 select-none" aria-hidden="true">/</span>
+      <span class="text-zinc-600 select-none">/</span>
     {% endif %}
   {% endfor %}
 </nav>

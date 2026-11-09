@@ -1,0 +1,35 @@
+{% set contentTitle = block.title ?? null %}
+{% set contentImage = block.image.one() ?? null %}
+{% set contentText = block.paragraphs ?? null %}
+
+{% if contentTitle or contentImage or contentText %}
+<section class="my-20 pt-16 border-t border-zinc-200">
+  <div class="space-y-6">
+    {% if contentTitle %}
+      <div class="max-w-2xl">
+        <h2 class="text-2xl sm:text-3xl font-light text-zinc-900 tracking-tight">
+          {{ contentTitle }}
+        </h2>
+      </div>
+    {% endif %}
+
+    {% if contentImage %}
+      <div class="w-full aspect-[16/9] overflow-hidden rounded-2xl bg-zinc-100 shadow-sm">
+        <img
+          src="{{ contentImage.url }}"
+          alt="{{ contentImage.alt ?? contentImage.title ?? contentTitle }}"
+          class="w-full h-full object-cover object-center"
+        />
+      </div>
+    {% endif %}
+
+    {% if contentText %}
+      <div class="max-w-3xl pt-2">
+        <div class="text-base sm:text-lg text-zinc-600 font-light leading-relaxed">
+          {{ contentText|nl2br }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
