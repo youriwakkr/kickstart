@@ -261,8 +261,8 @@ rm -f .env                                       # It's created again in step 4
 | `.ddev/config.yaml` | `name: CraftCMStest` → `name: my-project` |
 | `vite.config.js` | `"craftcmstest.ddev.site"` in `allowedHosts` → `"my-project.ddev.site"` |
 | `package.json` | `"name": "craftcmstest"` → `"name": "my-project"` |
-| `templates/_partials/header.twig` | Logo, site name and navigation |
-| `templates/_partials/footer.twig` | Footer text, social links and email address |
+| `templates/_partials/header.twig` | Logo mark and "Kickstart" name (nav lists the first 5 **Pages** entries) |
+| `templates/_partials/footer.twig` | Logo, "Kickstart" name, tagline and copyright |
 | Control panel: **Settings → General** | System name (used in the page `<title>`) and the email settings |
 
 ### 4. Create the `.env` file

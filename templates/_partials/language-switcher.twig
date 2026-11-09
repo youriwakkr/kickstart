@@ -1,38 +1,35 @@
-<nav aria-label="Language selection" class="inline-flex items-center gap-2 text-xs tracking-wider uppercase font-medium">
-  {% for site in craft.app.sites.getAllSites() %}
-    {% set targetUrl = null %}
+{% set sites = craft.app.sites.getAllSites() %}
 
-    {% if entry is defined and entry %}
-      {% set localizedEntry = craft.entries()
-        .id(entry.id)
-        .siteId(site.id)
-        .status(null)
-        .one() %}
+{% if sites|length > 1 %}
+  <nav aria-label="Language selection" class="inline-flex items-center rounded-full bg-zinc-100 p-0.5 text-xs font-medium">
+    {% for site in sites %}
+      {% set targetUrl = null %}
 
-      {% if localizedEntry and localizedEntry.enabled and localizedEntry.enabledForSite %}
-        {% set targetUrl = localizedEntry.getUrl() %}
+      {% if entry is defined and entry %}
+        {% set localizedEntry = craft.entries()
+          .id(entry.id)
+          .siteId(site.id)
+          .status(null)
+          .one() %}
+
+        {% if localizedEntry and localizedEntry.enabled and localizedEntry.enabledForSite %}
+          {% set targetUrl = localizedEntry.getUrl() %}
+        {% endif %}
       {% endif %}
-    {% endif %}
 
-    {% set targetUrl = targetUrl ?? site.getBaseUrl() %}
-    {% set isCurrent = currentSite.handle == site.handle %}
+      {% set targetUrl = targetUrl ?? site.getBaseUrl() %}
+      {% set label = site.language[: 2]|upper %}
 
-    {% if isCurrent %}
-      <span aria-current="page" class="text-white font-semibold border-b border-white pb-0.5">
-        {{ site.language[:2]|upper }}
-      </span>
-    {% else %}
-      <a
-        href="{{ targetUrl }}"
-        hreflang="{{ site.language }}"
-        class="text-zinc-400 hover:text-white transition-colors pb-0.5"
-      >
-        {{ site.language[:2]|upper }}
-      </a>
-    {% endif %}
-
-    {% if not loop.last %}
-      <span class="text-zinc-600 select-none">/</span>
-    {% endif %}
-  {% endfor %}
-</nav>
+      {% if currentSite.handle == site.handle %}
+        <span aria-current="page" class="rounded-full bg-white px-2.5 py-1 text-zinc-900 shadow-sm">{{ label }}</span>
+      {% else %}
+        <a
+          href="{{ targetUrl }}"
+          hreflang="{{ site.language }}"
+          lang="{{ site.language }}"
+          class="rounded-full px-2.5 py-1 text-zinc-500 transition-colors hover:text-zinc-900"
+        >{{ label }}</a>
+      {% endif %}
+    {% endfor %}
+  </nav>
+{% endif %}

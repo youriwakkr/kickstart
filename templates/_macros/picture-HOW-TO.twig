@@ -1,7 +1,12 @@
+{#
+  How to use the picture macro (templates/_macros/picture.twig).
+  Sizes are based on the layout container: max-w-6xl (1152px) with px-8 padding → ~1088px content.
+  Remember to eager-load images on listing pages: .with([['heroImage']])
+#}
 {% import '_macros/picture.twig' as ui %}
 
-{# Full width hero banner #}
-{# Loading: eager - For important priority images #}
+{# Full-width hero banner, above the fold #}
+{# loading 'eager' also sets fetchpriority="high": use it for the LCP image only #}
 {{ ui.picture({
   image: entry.heroImage.one(),
   widths: [400, 800, 1200, 1600, 2000],
@@ -11,20 +16,34 @@
   loading: 'eager'
 }) }}
 
-{# Two column layout grid #}
+{# Two-column layout grid #}
 {{ ui.picture({
   image: entry.heroImage.one(),
-  widths: [400, 640, 960, 1280],
-  sizes: '(min-width: 1280px) 640px, (min-width: 768px) 50vw, 100vw',
-  ratio: '16/9',
-  class: 'w-full h-auto object-cover',
-}) }}
-
-{# Three column layout grid #}
-{{ ui.picture({
-  image: entry.cardImage.one(),
-  widths: [380, 500, 760, 1000, 1260],
-  sizes: '(min-width: 1280px) 420px, (min-width: 1024px) 33.33vw, (min-width: 768px) 50vw, 100vw',
+  widths: [400, 640, 800, 1100, 1536],
+  sizes: '(min-width: 1152px) 544px, (min-width: 768px) 50vw, 100vw',
   ratio: '16/9',
   class: 'w-full h-auto object-cover'
+}) }}
+
+{# Three-column layout grid #}
+{{ ui.picture({
+  image: entry.cardImage.one(),
+  widths: [360, 480, 720, 1024],
+  sizes: '(min-width: 1152px) 363px, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw',
+  ratio: '16/9',
+  class: 'w-full h-auto object-cover'
+}) }}
+
+{# Keep the image's own proportions: leave out ratio #}
+{{ ui.picture({
+  image: entry.heroImage.one(),
+  widths: [400, 800, 1200],
+  sizes: '(min-width: 1152px) 1088px, 100vw',
+  class: 'w-full h-auto'
+}) }}
+
+{# Decorative image: empty alt text #}
+{{ ui.picture({
+  image: entry.heroImage.one(),
+  alt: ''
 }) }}

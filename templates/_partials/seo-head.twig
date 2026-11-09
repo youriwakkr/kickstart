@@ -32,9 +32,9 @@
       .all() -%}
 
     {%- for localized in localizedEntries|filter(e => e.url) %}
-  <link rel="alternate" hreflang="{{ localized.site.language }}" href="{{ localized.url }}"/>
+      <link rel="alternate" hreflang="{{ localized.site.language }}" href="{{ localized.url }}"/>
       {%- if localized.site.primary %}
-  <link rel="alternate" hreflang="x-default" href="{{ localized.url }}"/>
+        <link rel="alternate" hreflang="x-default" href="{{ localized.url }}"/>
       {%- endif -%}
     {%- endfor -%}
   {%- endif -%}

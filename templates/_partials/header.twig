@@ -1,67 +1,78 @@
-<header class="w-full bg-zinc-900 text-white sticky top-0 z-50 shadow-md">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-    <a href="{{ currentSite.getBaseUrl() }}" class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white shrink-0" style="width: 2rem; height: 2rem;">
-        <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" style="width: 1rem; height: 1rem;">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"/>
-        </svg>
-      </div>
-      <div class="flex flex-col">
-        <span class="text-base font-semibold tracking-widest uppercase text-white">
-          Youri Gruiters
-        </span>
-        <span class="text-[10px] tracking-wider uppercase text-zinc-400">
-          Photography
-        </span>
-      </div>
+{% set navPages = craft.entries()
+  .section('pages')
+  .limit(5)
+  .all() %}
+
+{% set linkBase = 'text-sm font-medium transition-colors' %}
+
+<header class="sticky top-0 z-50 w-full border-b border-zinc-200/70 bg-white/80 backdrop-blur-md">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+    <a href="{{ siteUrl() }}" class="group flex items-center gap-2.5" aria-label="Kickstart – home">
+      <span class="flex size-8 items-center justify-center rounded-lg bg-zinc-900 text-sm font-bold text-white transition-transform group-hover:-rotate-6">
+        K
+      </span>
+      <span class="text-base font-semibold tracking-tight text-zinc-900">Kickstart</span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-8 text-xs uppercase tracking-widest font-medium" aria-label="Main Navigation">
-      <a href="{{ currentSite.getBaseUrl() }}" class="text-zinc-300 hover:text-white transition-colors">
-        Portfolio
-      </a>
-      <a href="{{ currentSite.getBaseUrl() }}blogs" class="text-zinc-300 hover:text-white transition-colors">
-        Blogs
-      </a>
-      <a href="{{ currentSite.getBaseUrl() }}contact" class="text-zinc-300 hover:text-white transition-colors">
-        Contact
-      </a>
-    </nav>
+    {% if navPages|length %}
+      <nav class="hidden items-center gap-7 md:flex" aria-label="Main navigation">
+        {% for page in navPages %}
+          {% set isActive = entry is defined and entry and entry.id == page.id %}
+          <a
+            href="{{ page.url }}"
+            class="{{ linkBase }} {{ isActive ? 'text-zinc-900' : 'text-zinc-500 hover:text-zinc-900' }}"
+            {{ isActive ? 'aria-current="page"' }}
+          >
+            {{ page.title }}
+          </a>
+        {% endfor %}
+      </nav>
+    {% endif %}
 
-    <div class="flex items-center gap-4">
-      <div class="bg-zinc-800 px-3 py-1.5 rounded-md border border-zinc-700">
-        {% include '_partials/language-switcher.twig' with { entry: entry ?? null } only %}
-      </div>
+    <div class="flex items-center gap-3">
+      {% include '_partials/language-switcher.twig' with { entry: entry ?? null } only %}
 
-      <button
-        type="button"
-        id="mobile-nav-btn"
-        class="md:hidden p-2 text-zinc-400 hover:text-white focus:outline-none"
-        aria-label="Toggle navigation menu"
-      >
-        <svg class="w-6 h-6" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem;">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
-        </svg>
-      </button>
+      {% if navPages|length %}
+        <button
+          type="button"
+          class="-mr-2 rounded-md p-2 text-zinc-500 hover:text-zinc-900 md:hidden"
+          aria-controls="mobile-nav"
+          aria-expanded="false"
+          aria-label="Toggle menu"
+          data-nav-toggle
+        >
+          <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16"/>
+          </svg>
+        </button>
+      {% endif %}
     </div>
   </div>
 
-  <div id="mobile-nav-menu" class="hidden md:hidden bg-zinc-950 border-t border-zinc-800 px-6 py-6 space-y-4 text-xs uppercase tracking-widest font-medium">
-    <a href="{{ currentSite.getBaseUrl() }}" class="block py-2 text-zinc-300 hover:text-white">Portfolio</a>
-    <a href="{{ currentSite.getBaseUrl() }}blogs" class="block py-2 text-zinc-300 hover:text-white">Blogs</a>
-    <a href="{{ currentSite.getBaseUrl() }}contact" class="block py-2 text-zinc-300 hover:text-white">Contact</a>
-  </div>
-</header>
+  {% if navPages|length %}
+    <nav id="mobile-nav" class="hidden border-t border-zinc-200/70 px-4 py-3 sm:px-6 md:hidden" aria-label="Mobile navigation">
+      {% for page in navPages %}
+        {% set isActive = entry is defined and entry and entry.id == page.id %}
+        <a
+          href="{{ page.url }}"
+          class="block rounded-md px-2 py-2.5 {{ linkBase }} {{ isActive ? 'text-zinc-900' : 'text-zinc-500 hover:text-zinc-900' }}"
+          {{ isActive ? 'aria-current="page"' }}
+        >
+          {{ page.title }}
+        </a>
+      {% endfor %}
+    </nav>
 
-<script>
-  (function () {
-    const btn = document.getElementById("mobile-nav-btn");
-    const menu = document.getElementById("mobile-nav-menu");
-    if (btn && menu) {
-      btn.addEventListener("click", function () {
-        menu.classList.toggle("hidden");
-      });
-    }
-  })();
-</script>
+    <script>
+      (() => {
+        const btn = document.querySelector("[data-nav-toggle]");
+        const menu = document.getElementById("mobile-nav");
+        btn?.addEventListener("click", () => {
+          const open = btn.getAttribute("aria-expanded") === "true";
+          btn.setAttribute("aria-expanded", String(!open));
+          menu.classList.toggle("hidden", open);
+        });
+      })();
+    </script>
+  {% endif %}
+</header>
