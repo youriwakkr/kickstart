@@ -1,0 +1,13 @@
+columnSuffix: null
+handle: imageLeft
+instructions: 'Show the image on the left of the text (on larger screens).'
+name: 'Image left'
+searchable: false
+settings:
+  default: false
+  offLabel: null
+  onLabel: null
+  showLabelsInCards: false
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\Lightswitch

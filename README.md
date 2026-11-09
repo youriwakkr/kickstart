@@ -44,45 +44,84 @@ A starter project for new Craft CMS 5 websites. Copy it, rename a few things, an
   - `Nederlands` (`nl-NL`): the primary site, at `$PRIMARY_SITE_URL`
   - `English` (`en`): at `$PRIMARY_SITE_URL_EN`
 - **Sections**:
-  - `Homepage`: a single at `__home__`, using the template `homepage/index.twig`
-  - `Pages`: a channel at `{slug}`, using the template `_pages/_entry.twig`
-- **Entry type**: `Page`, used by both sections.
+  - `Homepage`: a single at `__home__`, using the template `_homepage/index.twig`
+  - `Pages`: a structure at `{parent ? parent.uri ~ '/'}{slug}` (nested URLs such as `about/team`), using the template `_pages/_entry.twig`
+- **Entry type**: `Page`, used by both sections. Its only field besides the title is `pagebuilder`, so every page is built from blocks.
 - **Volume**: `Images volume`, served from `$PRIMARY_SITE_UPLOADS_URL` (`web/uploads/`, which git ignores).
-- **Tag group**: `Blog tags`.
+- **Shared fields**: reused across blocks. Craft 5 lets you add a field to a layout more than once under a different handle and label (for example `subheading` appears as `caption` and `quoteAuthor`).
+
+  | Handle | Type | Notes |
+  | --- | --- | --- |
+  | `heading` | Plain Text | Translatable |
+  | `subheading` | Plain Text | Translatable |
+  | `texteditor` | CKEditor | Full toolbar (see below) |
+  | `simpleTexteditor` | CKEditor | Bold, italic, link, lists. For short texts such as CTAs and FAQ answers |
+  | `image` | Assets | Max 1, images only |
+  | `images` | Assets | Multiple, images only |
+  | `button` | Link | Entry, URL, email, phone or asset, with label and "open in new tab". (`link` is a reserved handle in Craft) |
+  | `quote` | Plain Text (multi-line) | pbQuote |
+  | `imageLeft` | Lightswitch | pbTextImage |
+  | `videoUrl` | Link (URL only) | pbVideo, YouTube or Vimeo |
+  | `faqItems` | Matrix | pbFaq, nested `faqItem` entries (title = question, `answer` = simpleTexteditor) |
+
+- **Pagebuilder** (`pagebuilder`, Matrix): each block is a nested entry type with a template in `_components/<handle>.twig`:
+
+  | Block | Fields |
+  | --- | --- |
+  | `pbHero` | heading*, subheading, image, button. Renders the page's `<h1>`, so use it as the first block |
+  | `pbText` | heading, texteditor* |
+  | `pbTextImage` | heading, texteditor, image*, imageLeft, button |
+  | `pbImage` | image*, caption |
+  | `pbGallery` | heading, images* |
+  | `pbQuote` | quote*, quoteAuthor |
+  | `pbCta` | heading*, simpleTexteditor, button |
+  | `pbVideo` | videoUrl*, image (poster). With a poster, the player only loads after a click |
+  | `pbFaq` | heading, faqItems* |
+
+  \* required
+- **Globals**:
+  - `Navigation`: `mainNavigation` (header and mobile menu) and `footerNavigation` (footer). Both are entries fields that pick from Pages, in the order you set.
+  - `Site settings`: `companyName` (logo text and copyright; falls back to "Kickstart"), `phone`, `email`, `address` (native Addresses field, max 1, output with `|address`) and `footerText` (translatable).
 - **Rich text field** `texteditor` (CKEditor):
-  - Toolbar: headings H2 to H4, bold, italic, links, bulleted and numbered lists, blockquote, horizontal line, remove formatting, and source editing (admins only). H1 is left out because it's reserved for the page title.
+  - Toolbar: headings H1 to H6, bold, italic, links, bulleted and numbered lists, blockquote, horizontal line, remove formatting, and source editing (admins only). Note that `pbHero` already renders the page's `<h1>`.
+  - `config/ckeditor/editor.css` (the field's "CSS file") styles H1 to H6 inside the editor in the control panel. Without it, headings fall back to the CP's own UI styles, where H3 is body size and H6 isn't styled. It uses the same heading scale as the `rich-text` utility, so keep the two in sync.
   - `config/ckeditor/default.json` holds the CKEditor options: an "Open in a new tab" checkbox on links (adds `target="_blank" rel="noopener noreferrer"`), `https://` as the default link protocol, and a start number for numbered lists. To give another field its own setup, add a JSON file next to it and choose it in that field's settings.
   - `config/htmlpurifier/Default.json` cleans the saved HTML. It allows `rel="noopener noreferrer nofollow"`, strips inline `style` attributes, and only allows YouTube and Vimeo iframes.
   - Output it with `{{ entry.texteditor }}`. The value is already purified, so `|raw` isn't needed.
+  - Wrap it in `class="rich-text"` (defined with `@utility` in `src/css/app.css`) for headings, lists, links and blockquotes. Add `rich-text-invert` on dark backgrounds. The kickstart doesn't use `@tailwindcss/typography`.
 
 ### Templates
 
 ```
 templates/
 ├── _layouts/_layout.twig            # Base HTML: <head> (GTM, SEO partial, SEOMate hook, Vite), header, <main>, footer
-├── _partials/header.twig            # Site header, main nav, language switcher, mobile nav toggle
-├── _partials/footer.twig            # Site footer
-├── _partials/seo-head.twig          # Fallback <title>, canonical + hreflang (skipped when SEOmatic/SEOMate is enabled)
+├── _partials/header.twig            # Site header, main nav (Globals → Navigation), language switcher, mobile nav toggle
+├── _partials/footer.twig            # Site footer: company name, footer text, contact details, footer nav
+├── _partials/seo-head.twig          # Fallback <title>, canonical, hreflang, Open Graph (skipped when SEOmatic/SEOMate is enabled)
 ├── _partials/language-switcher.twig # NL / EN switcher that links to the same entry on the other site
-├── _components/                     # Example page-builder components (pbContent, pbQuote)
+├── _partials/pagebuilder.twig       # Renders an entry's pagebuilder blocks (with eager loading)
+├── _partials/button.twig            # Button from a Link field (primary / secondary)
+├── _components/                     # One template per pagebuilder block (pbHero, pbText, pbTextImage, …)
+├── _pages/_entry.twig               # Page template
 ├── _macros/picture.twig             # Responsive, multi-format <picture> macro
 ├── _macros/picture-HOW-TO.twig      # Examples for the picture macro (full width, 2 and 3 columns)
 ├── _emails/                         # Custom system emails (base layout + reset password)
 ├── _samples/                        # Optional files to copy in per project (e.g. per plugin)
 │   └── seomate/robots.txt.twig      # robots.txt for projects using SEOMate
-├── _blogs/                          # Example blog overview and blog entry templates (no blog section yet)
-└── homepage/index.twig              # Homepage template
+└── _homepage/index.twig             # Homepage template
 ```
 
 Folders starting with `_` can't be opened directly as URLs.
 
-**Page-builder components:** the kickstart doesn't have a page-builder (Matrix) field yet. Once you add one, render its blocks by entry type handle, with a matching template in `_components/`:
+**Pagebuilder:** both page templates just include the pagebuilder partial:
 
 ```twig
-{% for block in entry.pagebuilder.all() %}
-  {% include '_components/' ~ block.type.handle ignore missing with { block: block } only %}
-{% endfor %}
+{% include '_partials/pagebuilder.twig' with { entry: entry ?? null } only %}
 ```
+
+It eager-loads `image`, `images` and `faqItems`, and includes `_components/<block type handle>.twig` for each block with `block` and `isFirst`. The first block uses `isFirst` to load its image eagerly, since it's usually the LCP image. To add a block: create a nested entry type, add it to the `pagebuilder` field, and add a template with the same handle in `_components/`.
+
+**Open Graph:** `seo-head.twig` outputs `og:title`, `og:url` and, when the page has a `pbHero` with an image, a 1200×630 `og:image`.
 
 **Page title:** while no SEO plugin is installed, `seo-head.twig` outputs "Entry title | System name". The homepage and pages without an entry show just the system name, which you set under **Settings → General → System Name**.
 
@@ -97,7 +136,7 @@ Use them in Twig with the `t` filter: `{{ 'Read more'|t }}`. Add each new key to
 
 ### Front-end
 
-- `src/js/app.js` is the Vite entry point. It imports `src/css/app.css` and `src/js/web-vitals.js`.
+- `src/js/app.js` is the Vite entry point. It imports `src/css/app.css` and `src/js/web-vitals.js`, and holds the click-to-play handler for `pbVideo`.
 - `src/css/app.css` imports Tailwind 4 and scans `templates/**/*.{twig,html}` for classes. Tailwind is configured in this CSS file (`@theme`, `@source`), so there's no `tailwind.config.js`.
 - The production build goes to `web/dist/`, which git ignores.
 - `src/js/web-vitals.js` measures Core Web Vitals (LCP, INP, CLS, plus FCP and TTFB). On the Vite dev server it logs them to the browser console. In the production build it pushes them to the GTM `dataLayer` as a `web_vitals` event, but only when GTM is loaded. Otherwise nothing is sent.

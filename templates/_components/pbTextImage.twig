@@ -1,0 +1,39 @@
+{# Text & image: heading, texteditor, image, imageLeft, button #}
+{% import '_macros/picture.twig' as ui %}
+
+{% set image = block.image.one() %}
+
+<section class="my-16 first:mt-0 grid items-center gap-10 md:grid-cols-2 lg:gap-16">
+  <div class="space-y-6 {{ block.imageLeft ? 'md:order-2' }}">
+    {% if block.heading %}
+      <h2 class="text-2xl font-light tracking-tight text-zinc-900 sm:text-3xl text-balance">
+        {{ block.heading }}
+      </h2>
+    {% endif %}
+
+    {% if block.texteditor %}
+      <div class="rich-text">
+        {{ block.texteditor }}
+      </div>
+    {% endif %}
+
+    {% if block.button and block.button.url %}
+      <div class="pt-2">
+        {% include '_partials/button.twig' with { link: block.button } only %}
+      </div>
+    {% endif %}
+  </div>
+
+  {% if image %}
+    <div class="overflow-hidden rounded-2xl bg-zinc-100 {{ block.imageLeft ? 'md:order-1' }}">
+      {{ ui.picture({
+        image: image,
+        widths: [400, 640, 800, 1100, 1536],
+        sizes: '(min-width: 1152px) 544px, (min-width: 768px) 50vw, 100vw',
+        ratio: '4/3',
+        class: 'h-full w-full object-cover',
+        loading: isFirst ? 'eager' : 'lazy'
+      }) }}
+    </div>
+  {% endif %}
+</section>

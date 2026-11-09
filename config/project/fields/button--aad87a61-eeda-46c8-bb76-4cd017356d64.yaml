@@ -1,0 +1,20 @@
+columnSuffix: null
+handle: button
+instructions: null
+name: Button
+searchable: false
+settings:
+  advancedFields:
+    - target
+  fullGraphqlData: true
+  maxLength: 255
+  showLabelField: true
+  types:
+    - entry
+    - url
+    - email
+    - tel
+    - asset
+translationKeyFormat: null
+translationMethod: site
+type: craft\fields\Link

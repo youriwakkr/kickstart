@@ -1,0 +1,45 @@
+/*
+  Editor styles for CKEditor fields in the control panel (set as "CSS file" on the field).
+  Craft wraps this file in the field's own selector, so it only affects that editor.
+
+  Without it, headings in the editor fall back to the CP's UI styles, where H3 is body size
+  and H6 isn't styled at all. The scale mirrors the rich-text utility in src/css/app.css.
+*/
+
+.ck-content :where(h1, h2, h3, h4, h5, h6) {
+  color: #18181b;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin-block: 1.5em 0.5em;
+}
+
+.ck-content h1 {
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.ck-content h2 {
+  font-size: 24px;
+}
+
+.ck-content h3 {
+  font-size: 20px;
+}
+
+.ck-content h4 {
+  font-size: 18px;
+}
+
+.ck-content h5 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ck-content h6 {
+  color: #71717a;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}

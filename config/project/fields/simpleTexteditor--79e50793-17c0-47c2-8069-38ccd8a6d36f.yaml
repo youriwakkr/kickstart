@@ -1,0 +1,45 @@
+columnSuffix: null
+handle: simpleTexteditor
+instructions: 'Short formatted text: bold, italic, links and lists.'
+name: 'Simple texteditor'
+searchable: false
+settings:
+  advancedLinkFields:
+    - target
+  availableTransforms: '*'
+  availableVolumes: '*'
+  characterLimit: null
+  css: null
+  cssFile: null
+  defaultTransform: null
+  defaultUploadLocationSubpath: null
+  defaultUploadLocationVolume: null
+  fullGraphqlData: true
+  headingLevels: false
+  imageEntryTypeUid: null
+  imageFieldUid: null
+  imageMode: img
+  js: null
+  jsFile: default.json
+  options: null
+  parseEmbeds: false
+  purifierConfig: null
+  purifyHtml: true
+  showUnpermittedFiles: false
+  showUnpermittedVolumes: false
+  showWordCount: false
+  sourceEditingGroups:
+    - __ADMINS__
+  toolbar:
+    - bold
+    - italic
+    - link
+    - '|'
+    - bulletedList
+    - numberedList
+    - '|'
+    - removeFormat
+  wordLimit: null
+translationKeyFormat: null
+translationMethod: site
+type: craft\ckeditor\Field

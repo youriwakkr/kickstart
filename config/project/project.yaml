@@ -1,4 +1,4 @@
-dateModified: 1794239386
+dateModified: 1794242037
 email:
   fromEmail: admin@wakkr.com
   fromName: craftcmstest
@@ -13,15 +13,44 @@ fs:
     url: $PRIMARY_SITE_UPLOADS_URL
 meta:
   __names__:
-    1b7f2dbe-a8a7-485b-80e5-5391ada8b97f: 'Blog tags' # Blog tags
     5d562239-c045-4b64-becc-2660b279bd2d: Nederlands # Nederlands
+    6a88e6ef-0fb6-496a-8b7f-06cec06ca890: 'Main navigation' # Main navigation
+    6c173321-80ae-49a8-a6a7-c819e669c6c6: Gallery # Gallery
+    7f566119-7c14-48f4-a713-0bb55b6a84ca: Phone # Phone
+    8e59783d-dbdf-4eeb-b80b-7365cd32f17e: Image # Image
+    8ed18ab0-d10b-4edc-880b-bffed6c65735: Subheading # Subheading
+    9e791547-7f16-4982-a84d-93124c82dfc7: Navigation # Navigation
+    17eb79de-ccd3-40de-9e06-68ed1219ba2e: 'FAQ items' # FAQ items
+    24ac6a0f-7bc3-4c7a-b3fd-16a05faff3a1: Heading # Heading
+    39e45acc-d694-4e38-a865-f88b137edc72: Address # Address
+    72cde50a-fa50-49b6-b205-55805eb19f8c: Quote # Quote
+    78e271d2-0187-4c02-95be-8e7e2c6523a5: 'Company name' # Company name
+    79e50793-17c0-47c2-8069-38ccd8a6d36f: 'Simple texteditor' # Simple texteditor
     83d23b24-d706-497e-a1ff-364092637da8: Page # Page
+    86c1f1d2-cc41-4997-8350-3a6a6b30bb72: 'Footer text' # Footer text
     298c73d1-5e6d-4a5e-b2c9-b0a44f365c27: Pages # Pages
+    953a3a1d-472b-4b25-aad1-bd2b65016b1b: Email # Email
+    01311a54-6117-4ea4-b39f-94717445897a: 'Site settings' # Site settings
     1315f0d3-39d5-4db8-82fe-75feb6a29ee3: craftcmstest # craftcmstest
+    1959625a-33c3-4d26-b1ca-806e9b7f84b5: Quote # Quote
+    24824044-5dbd-449b-856c-ed6aa9debef5: FAQ # FAQ
+    79046063-38be-4e9e-bfc8-a8941168435f: 'Text & image' # Text & image
+    a5cd61f9-b5bd-4cf7-9959-cffa7a305eb2: Hero # Hero
     a9dfe936-fbbc-4ba1-8e5d-65cb8e29928d: Homepage # Homepage
+    aad87a61-eeda-46c8-bb76-4cd017356d64: Button # Button
+    acdabb39-4426-4769-99c2-5d683ef02bc8: 'Footer navigation' # Footer navigation
+    ae69045f-4246-4b50-b6be-2e08ef41a543: Video # Video
+    b6bc6959-4f1f-4204-bbf8-41ddbb4f36e3: 'Video URL' # Video URL
     ba7f3ecd-a8df-4337-9373-f09268b082b9: Texteditor # Texteditor
     bb3d5734-fed6-44a9-94b6-c2a5710980fa: English # English
+    c071c544-5c59-49ca-b299-e0afdf05efb1: Text # Text
     c96be51f-6b8b-45fd-89f5-eb64e887af3f: 'Public Schema' # Public Schema
+    cbd1c33c-d34b-4f0a-8d38-be02a3c5eddd: Image # Image
+    cfd5f929-1f90-4ad9-b8b7-270f127fbeba: 'Image left' # Image left
+    eb585732-8302-40af-ba54-0d86bdad6bbe: Pagebuilder # Pagebuilder
+    ecd82abb-69c9-41b8-9f58-622157309065: 'Call to action' # Call to action
+    ed8c76c0-6102-486e-ab00-69bda4eff8fa: Images # Images
+    f20e4b57-aa81-46b3-afaf-be5143ef8cdf: 'FAQ item' # FAQ item
     fdaca0fe-0ab7-47b3-82c1-ce23d13b606f: 'Images volume' # Images volume
 plugins:
   ckeditor:

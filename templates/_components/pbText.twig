@@ -1,0 +1,14 @@
+{# Text: heading, texteditor #}
+{% if block.texteditor %}
+  <section class="my-16 first:mt-0 max-w-3xl space-y-6">
+    {% if block.heading %}
+      <h2 class="text-2xl font-light tracking-tight text-zinc-900 sm:text-3xl text-balance">
+        {{ block.heading }}
+      </h2>
+    {% endif %}
+
+    <div class="rich-text">
+      {{ block.texteditor }}
+    </div>
+  </section>
+{% endif %}

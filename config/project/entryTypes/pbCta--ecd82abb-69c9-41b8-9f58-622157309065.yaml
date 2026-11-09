@@ -1,0 +1,77 @@
+allowLineBreaksInTitles: false
+color: null
+description: null
+fieldLayouts:
+  fc66e0f5-ffbf-43d6-9a76-120ff38cfc3e:
+    cardThumbAlignment: end
+    tabs:
+      -
+        elementCondition: null
+        elements:
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: 24ac6a0f-7bc3-4c7a-b3fd-16a05faff3a1 # Heading
+            handle: null
+            instructions: null
+            label: null
+            oldFieldUid: null
+            required: true
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 9e3374a1-018c-4a86-afd7-8a7c922d9cd0
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: 79e50793-17c0-47c2-8069-38ccd8a6d36f # Simple texteditor
+            handle: null
+            instructions: null
+            label: Text
+            oldFieldUid: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: e2f6fe61-3fca-4fb2-8caa-7ef9ffabff77
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: aad87a61-eeda-46c8-bb76-4cd017356d64 # Button
+            handle: null
+            instructions: null
+            label: null
+            oldFieldUid: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 155add7f-47db-42d2-9550-dbdbdf84e126
+            userCondition: null
+            warning: null
+            width: 100
+        name: Content
+        uid: b641a34c-cf94-454a-b823-583d355a76a0
+        userCondition: null
+    thumbFieldKey: null
+handle: pbCta
+hasTitleField: false
+icon: bullhorn
+name: 'Call to action'
+showSlugField: false
+showStatusField: true
+slugTranslationKeyFormat: null
+slugTranslationMethod: site
+titleFormat: null
+titleTranslationKeyFormat: null
+titleTranslationMethod: site
+uiLabelFormat: '{heading}'

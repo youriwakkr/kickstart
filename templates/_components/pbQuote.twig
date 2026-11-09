@@ -1,14 +1,18 @@
-{% set quoteText = block.title ?? null %}
+{# Quote: quote, quoteAuthor #}
+{% if block.quote %}
+  <figure class="my-16 first:mt-0 rounded-2xl border border-zinc-200 bg-zinc-50 px-8 py-12 text-center sm:px-12">
+    <div class="mx-auto max-w-3xl space-y-6">
+      <svg class="mx-auto size-8 text-zinc-300" width="32" height="32" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+      </svg>
 
-{% if quoteText %}
-<section class="my-20 py-12 px-8 sm:px-12 rounded-2xl bg-zinc-50 border border-zinc-200 text-center">
-  <div class="max-w-3xl mx-auto space-y-4">
-    <svg class="w-8 h-8 mx-auto text-zinc-300" width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
-    </svg>
-    <blockquote class="text-xl sm:text-2xl font-light text-zinc-900 leading-relaxed italic">
-      &ldquo;{{ quoteText }}&rdquo;
-    </blockquote>
-  </div>
-</section>
+      <blockquote class="text-xl font-light italic leading-relaxed text-zinc-900 sm:text-2xl text-balance">
+        <p>{{ block.quote|nl2br }}</p>
+      </blockquote>
+
+      {% if block.quoteAuthor %}
+        <figcaption class="text-sm font-medium text-zinc-500">{{ block.quoteAuthor }}</figcaption>
+      {% endif %}
+    </div>
+  </figure>
 {% endif %}

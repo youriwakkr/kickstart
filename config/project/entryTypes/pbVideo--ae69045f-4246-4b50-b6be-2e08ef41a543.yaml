@@ -1,0 +1,60 @@
+allowLineBreaksInTitles: false
+color: null
+description: null
+fieldLayouts:
+  256d935b-469d-4814-99a1-4f17e445b0b0:
+    cardThumbAlignment: end
+    tabs:
+      -
+        elementCondition: null
+        elements:
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: b6bc6959-4f1f-4204-bbf8-41ddbb4f36e3 # Video URL
+            handle: null
+            instructions: null
+            label: null
+            oldFieldUid: null
+            required: true
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: c9a0ac90-c76e-46a2-9903-51d24fc70c9e
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: 8e59783d-dbdf-4eeb-b80b-7365cd32f17e # Image
+            handle: null
+            instructions: 'Optional. Shown until the visitor clicks play.'
+            label: 'Poster image'
+            oldFieldUid: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 6c1d4cfd-c913-43b1-a914-4d1c05c7142b
+            userCondition: null
+            warning: null
+            width: 100
+        name: Content
+        uid: da0a5483-cef8-4234-a5d8-9ee607ce225f
+        userCondition: null
+    thumbFieldKey: null
+handle: pbVideo
+hasTitleField: false
+icon: video
+name: Video
+showSlugField: false
+showStatusField: true
+slugTranslationKeyFormat: null
+slugTranslationMethod: site
+titleFormat: null
+titleTranslationKeyFormat: null
+titleTranslationMethod: site
+uiLabelFormat: '{title}'

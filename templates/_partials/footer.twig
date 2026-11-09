@@ -1,24 +1,44 @@
-{% set footerPages = craft.entries()
-  .section('pages')
-  .limit(5)
-  .all() %}
+{# Content from Globals → Navigation (footerNavigation) and Globals → Site settings #}
+{% set footerPages = navigation.footerNavigation.all() ?? [] %}
+{% set brandName = siteSettings.companyName ?? null ?: 'Kickstart' %}
+{% set footerText = siteSettings.footerText ?? null %}
+{% set phone = siteSettings.phone ?? null %}
+{% set email = siteSettings.email ?? null %}
+{% set address = siteSettings.address.one() ?? null %}
 
 <footer class="mt-auto w-full border-t border-zinc-200 bg-zinc-50">
   <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-    <div class="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+    <div class="grid gap-10 md:grid-cols-3">
       <div class="max-w-sm space-y-3">
         <a href="{{ siteUrl() }}" class="flex items-center gap-2.5">
-          <span class="flex size-7 items-center justify-center rounded-md bg-zinc-900 text-xs font-bold text-white">K</span>
-          <span class="text-sm font-semibold tracking-tight text-zinc-900">Kickstart</span>
+          <span class="flex size-7 items-center justify-center rounded-md bg-zinc-900 text-xs font-bold text-white" aria-hidden="true">{{ brandName|first|upper }}</span>
+          <span class="text-sm font-semibold tracking-tight text-zinc-900">{{ brandName }}</span>
         </a>
-        <p class="text-sm leading-relaxed text-zinc-500">
-          A clean starting point for Craft CMS 5 projects.
-        </p>
+        {% if footerText %}
+          <p class="text-sm leading-relaxed text-zinc-500">{{ footerText|nl2br }}</p>
+        {% endif %}
       </div>
 
+      {% if phone or email or address %}
+        <div class="space-y-3 text-sm text-zinc-500">
+          <h2 class="font-semibold text-zinc-900">{{ 'Contact'|t }}</h2>
+          {% if address %}
+            <address class="not-italic leading-relaxed">{{ address|address }}</address>
+          {% endif %}
+          <ul class="space-y-1" role="list">
+            {% if phone %}
+              <li><a href="tel:{{ phone|replace('/[^0-9+]/', '') }}" class="transition-colors hover:text-zinc-900">{{ phone }}</a></li>
+            {% endif %}
+            {% if email %}
+              <li><a href="mailto:{{ email }}" class="transition-colors hover:text-zinc-900">{{ email }}</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+
       {% if footerPages|length %}
-        <nav aria-label="Footer navigation">
-          <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <nav aria-label="{{ 'Footer navigation'|t }}" class="md:justify-self-end">
+          <ul class="space-y-2 text-sm" role="list">
             {% for page in footerPages %}
               <li>
                 <a href="{{ page.url }}" class="text-zinc-500 transition-colors hover:text-zinc-900">{{ page.title }}</a>
@@ -30,7 +50,7 @@
     </div>
 
     <div class="mt-10 flex flex-col gap-2 border-t border-zinc-200 pt-6 text-xs text-zinc-400 sm:flex-row sm:items-center sm:justify-between">
-      <p>&copy; {{ now|date('Y') }} Kickstart</p>
+      <p>&copy; {{ now|date('Y') }} {{ brandName }}</p>
       <p>Built with Craft CMS</p>
     </div>
   </div>

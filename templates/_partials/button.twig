@@ -1,0 +1,21 @@
+{#
+  Button from a Link field (handle: button).
+
+  Expects:
+  - link    (LinkData|null) e.g. block.button
+  - variant (String)        'primary' (default) or 'secondary'
+#}
+{% if link and link.url %}
+  {% set classes = {
+    primary: 'bg-zinc-900 text-white hover:bg-zinc-700',
+    secondary: 'border border-zinc-300 text-zinc-900 hover:border-zinc-900'
+  } %}
+  <a
+    href="{{ link.url }}"
+    class="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-colors {{ classes[variant ?? 'primary'] ?? classes.primary }}"
+    {% if link.target %}target="{{ link.target }}"{% endif %}
+    {% if link.target == '_blank' %}rel="noopener noreferrer"{% endif %}
+  >
+    {{ link.label }}
+  </a>
+{% endif %}

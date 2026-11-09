@@ -22,6 +22,19 @@
     : craft.app.request.absoluteUrl|split('?')|first -%}
   <link rel="canonical" href="{{ canonicalUrl }}"/>
 
+  {# Open Graph: title, URL and the image of the first pbHero block (when it has one) #}
+  {%- set ogImage = entry and entry.pagebuilder is defined
+    ? (entry.pagebuilder.type('pbHero').one().image.one() ?? null)
+    : null -%}
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="{{ (entry and not isHome) ? entry.title : systemName }}"/>
+  <meta property="og:url" content="{{ canonicalUrl }}"/>
+  {%- if ogImage and ogImage.kind == 'image' %}
+    <meta property="og:image" content="{{ ogImage.getUrl({ mode: 'crop', width: 1200, height: 630, format: 'jpg' }, true) }}"/>
+    <meta property="og:image:width" content="1200"/>
+    <meta property="og:image:height" content="630"/>
+  {%- endif %}
+
   {# hreflang: one link per site where this entry is live, plus x-default (primary site). Skipped on paginated pages. #}
   {%- set sites = craft.app.sites.getAllSites() -%}
   {%- if entry and pageNum == 1 and sites|length > 1 -%}

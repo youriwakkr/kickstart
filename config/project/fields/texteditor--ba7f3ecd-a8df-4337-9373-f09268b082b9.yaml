@@ -10,7 +10,7 @@ settings:
   availableVolumes: '*'
   characterLimit: null
   css: null
-  cssFile: null
+  cssFile: editor.css
   defaultTransform: null
   defaultUploadLocationSubpath: null
   defaultUploadLocationVolume: null

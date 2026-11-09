@@ -18,10 +18,13 @@ siteSettings:
     enabledByDefault: true
     hasUrls: true
     template: _pages/_entry.twig
-    uriFormat: '{slug}'
+    uriFormat: "{parent ? parent.uri ~ '/'}{slug}"
   bb3d5734-fed6-44a9-94b6-c2a5710980fa: # English
     enabledByDefault: true
     hasUrls: true
     template: _pages/_entry.twig
-    uriFormat: '{slug}'
-type: channel
+    uriFormat: "{parent ? parent.uri ~ '/'}{slug}"
+structure:
+  maxLevels: null
+  uid: 7947f789-93a4-4ff3-81a9-743affef0d55
+type: structure

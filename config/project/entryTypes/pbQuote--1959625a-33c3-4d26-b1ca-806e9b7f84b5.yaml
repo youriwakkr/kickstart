@@ -1,0 +1,60 @@
+allowLineBreaksInTitles: false
+color: null
+description: null
+fieldLayouts:
+  c0117fd3-49d3-4c52-912b-22806a8a78a7:
+    cardThumbAlignment: end
+    tabs:
+      -
+        elementCondition: null
+        elements:
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: 72cde50a-fa50-49b6-b205-55805eb19f8c # Quote
+            handle: null
+            instructions: null
+            label: null
+            oldFieldUid: null
+            required: true
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 05d0f66f-ce29-41ed-b111-e1b80a441f79
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: 8ed18ab0-d10b-4edc-880b-bffed6c65735 # Subheading
+            handle: quoteAuthor
+            instructions: null
+            label: Author
+            oldFieldUid: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: aa1ff65d-f343-47d8-912d-e280990352ae
+            userCondition: null
+            warning: null
+            width: 100
+        name: Content
+        uid: 51df8cf3-2ff6-4ad5-ab1a-8b85bd650fb9
+        userCondition: null
+    thumbFieldKey: null
+handle: pbQuote
+hasTitleField: false
+icon: quote-left
+name: Quote
+showSlugField: false
+showStatusField: true
+slugTranslationKeyFormat: null
+slugTranslationMethod: site
+titleFormat: null
+titleTranslationKeyFormat: null
+titleTranslationMethod: site
+uiLabelFormat: '{quoteAuthor}'

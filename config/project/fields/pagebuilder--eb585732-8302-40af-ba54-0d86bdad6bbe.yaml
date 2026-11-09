@@ -1,0 +1,66 @@
+columnSuffix: null
+handle: pagebuilder
+instructions: null
+name: Pagebuilder
+searchable: false
+settings:
+  createButtonLabel: 'Add block'
+  defaultIndexViewMode: cards
+  enableVersioning: false
+  entryTypes:
+    -
+      __assoc__:
+        -
+          - uid
+          - a5cd61f9-b5bd-4cf7-9959-cffa7a305eb2 # Hero
+    -
+      __assoc__:
+        -
+          - uid
+          - c071c544-5c59-49ca-b299-e0afdf05efb1 # Text
+    -
+      __assoc__:
+        -
+          - uid
+          - 79046063-38be-4e9e-bfc8-a8941168435f # Text & image
+    -
+      __assoc__:
+        -
+          - uid
+          - cbd1c33c-d34b-4f0a-8d38-be02a3c5eddd # Image
+    -
+      __assoc__:
+        -
+          - uid
+          - 6c173321-80ae-49a8-a6a7-c819e669c6c6 # Gallery
+    -
+      __assoc__:
+        -
+          - uid
+          - 1959625a-33c3-4d26-b1ca-806e9b7f84b5 # Quote
+    -
+      __assoc__:
+        -
+          - uid
+          - ecd82abb-69c9-41b8-9f58-622157309065 # Call to action
+    -
+      __assoc__:
+        -
+          - uid
+          - ae69045f-4246-4b50-b6be-2e08ef41a543 # Video
+    -
+      __assoc__:
+        -
+          - uid
+          - 24824044-5dbd-449b-856c-ed6aa9debef5 # FAQ
+  includeTableView: false
+  maxEntries: null
+  minEntries: null
+  pageSize: null
+  propagationKeyFormat: null
+  propagationMethod: all
+  showCardsInGrid: false
+  viewMode: blocks
+translationKeyFormat: null
+translationMethod: site
+type: craft\fields\Matrix

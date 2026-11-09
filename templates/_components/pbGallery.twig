@@ -1,0 +1,28 @@
+{# Gallery: heading, images #}
+{% import '_macros/picture.twig' as ui %}
+
+{% set images = block.images.all() %}
+
+{% if images|length %}
+  <section class="my-16 first:mt-0 space-y-8">
+    {% if block.heading %}
+      <h2 class="text-2xl font-light tracking-tight text-zinc-900 sm:text-3xl text-balance">
+        {{ block.heading }}
+      </h2>
+    {% endif %}
+
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+      {% for image in images %}
+        <li class="overflow-hidden rounded-xl bg-zinc-100">
+          {{ ui.picture({
+            image: image,
+            widths: [360, 480, 720, 1024],
+            sizes: '(min-width: 1152px) 363px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw',
+            ratio: '4/3',
+            class: 'h-full w-full object-cover'
+          }) }}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}

@@ -3,3 +3,109 @@
 
 /* Point Tailwind to your Craft CMS Twig templates */
 @source "../../templates/**/*.{twig,html}";
+
+/*
+  rich-text: styles the HTML from CKEditor fields (texteditor, simpleTexteditor).
+  Usage: <div class="rich-text">{{ block.texteditor }}</div>
+  On dark backgrounds, add rich-text-invert.
+*/
+@utility rich-text {
+  color: var(--color-zinc-600);
+  font-weight: 300;
+  line-height: 1.75;
+
+  & > * + * {
+    margin-top: 1.25em;
+  }
+
+  /* Headings H1–H6. Keep the scale in sync with config/ckeditor/editor.css (the CP editor). */
+  & :where(h1, h2, h3, h4, h5, h6) {
+    color: var(--color-zinc-900);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  & :where(* + h1, * + h2, * + h3, * + h4, * + h5, * + h6) {
+    margin-top: 2em;
+  }
+
+  & h1 {
+    font-size: var(--text-3xl);
+    line-height: 1.2;
+  }
+
+  & h2 {
+    font-size: var(--text-2xl);
+  }
+
+  & h3 {
+    font-size: var(--text-xl);
+  }
+
+  & h4 {
+    font-size: var(--text-lg);
+  }
+
+  & h5 {
+    font-size: var(--text-base);
+    font-weight: 600;
+  }
+
+  & h6 {
+    color: var(--color-zinc-500);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  & :where(strong, b) {
+    color: var(--color-zinc-900);
+    font-weight: 600;
+  }
+
+  & a {
+    color: var(--color-zinc-900);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  & a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  & ul {
+    list-style: disc;
+    padding-left: 1.25em;
+  }
+
+  & ol {
+    list-style: decimal;
+    padding-left: 1.25em;
+  }
+
+  & li + li {
+    margin-top: 0.5em;
+  }
+
+  & blockquote {
+    border-left: 2px solid var(--color-zinc-300);
+    color: var(--color-zinc-900);
+    font-style: italic;
+    padding-left: 1.25em;
+  }
+
+  & hr {
+    border-color: var(--color-zinc-200);
+    margin-block: 2.5em;
+  }
+}
+
+@utility rich-text-invert {
+  color: var(--color-zinc-300);
+
+  & :where(h1, h2, h3, h4, h5, h6, strong, b, a, blockquote) {
+    color: var(--color-white);
+  }
+}

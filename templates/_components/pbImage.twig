@@ -1,0 +1,22 @@
+{# Image: image, caption #}
+{% import '_macros/picture.twig' as ui %}
+
+{% set image = block.image.one() %}
+
+{% if image %}
+  <figure class="my-16 first:mt-0 space-y-3">
+    <div class="overflow-hidden rounded-2xl bg-zinc-100">
+      {{ ui.picture({
+        image: image,
+        widths: [400, 800, 1200, 1600, 2000],
+        sizes: '(min-width: 1152px) 1088px, 100vw',
+        class: 'h-auto w-full',
+        loading: isFirst ? 'eager' : 'lazy'
+      }) }}
+    </div>
+
+    {% if block.caption %}
+      <figcaption class="text-sm text-zinc-500">{{ block.caption }}</figcaption>
+    {% endif %}
+  </figure>
+{% endif %}

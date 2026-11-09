@@ -1,0 +1,37 @@
+{# Hero: heading, subheading, image, button #}
+{% import '_macros/picture.twig' as ui %}
+
+{% set image = block.image.one() %}
+
+<section class="my-12 first:mt-0 grid items-center gap-10 {{ image ? 'lg:grid-cols-2' }}">
+  <div class="space-y-6 {{ not image ? 'max-w-3xl' }}">
+    <h1 class="text-4xl font-light tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl text-balance">
+      {{ block.heading }}
+    </h1>
+
+    {% if block.subheading %}
+      <p class="text-lg font-light leading-relaxed text-zinc-600 sm:text-xl text-pretty">
+        {{ block.subheading }}
+      </p>
+    {% endif %}
+
+    {% if block.button and block.button.url %}
+      <div class="pt-2">
+        {% include '_partials/button.twig' with { link: block.button } only %}
+      </div>
+    {% endif %}
+  </div>
+
+  {% if image %}
+    <div class="overflow-hidden rounded-2xl bg-zinc-100">
+      {{ ui.picture({
+        image: image,
+        widths: [400, 640, 800, 1100, 1536],
+        sizes: '(min-width: 1152px) 544px, (min-width: 1024px) 50vw, 100vw',
+        ratio: '4/3',
+        class: 'h-full w-full object-cover',
+        loading: isFirst ? 'eager' : 'lazy'
+      }) }}
+    </div>
+  {% endif %}
+</section>

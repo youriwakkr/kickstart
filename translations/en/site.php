@@ -12,4 +12,8 @@ declare(strict_types=1);
 
 return [
     'Read more' => 'Read more',
+    'Contact' => 'Contact',
+    'Footer navigation' => 'Footer navigation',
+    'Video' => 'Video',
+    'Play video' => 'Play video',
 ];

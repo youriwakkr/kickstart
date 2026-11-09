@@ -1,0 +1,48 @@
+fieldLayouts:
+  84469935-79ef-4b19-ad08-9b91cc74deff:
+    cardThumbAlignment: end
+    tabs:
+      -
+        elementCondition: null
+        elements:
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: 6a88e6ef-0fb6-496a-8b7f-06cec06ca890 # Main navigation
+            handle: null
+            instructions: null
+            label: null
+            oldFieldUid: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 2875a85b-c13b-4c32-9472-5436089a63d4
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: acdabb39-4426-4769-99c2-5d683ef02bc8 # Footer navigation
+            handle: null
+            instructions: null
+            label: null
+            oldFieldUid: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 9393360b-6984-4618-8d89-55078cb8a7c5
+            userCondition: null
+            warning: null
+            width: 100
+        name: Navigation
+        uid: 51aaba18-a97f-4dcf-a70e-996e6dcc8f2a
+        userCondition: null
+    thumbFieldKey: null
+handle: navigation
+name: Navigation
+sortOrder: 2

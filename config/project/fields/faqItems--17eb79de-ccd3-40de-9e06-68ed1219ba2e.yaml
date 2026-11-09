@@ -1,0 +1,26 @@
+columnSuffix: null
+handle: faqItems
+instructions: null
+name: 'FAQ items'
+searchable: false
+settings:
+  createButtonLabel: 'Add question'
+  defaultIndexViewMode: cards
+  enableVersioning: false
+  entryTypes:
+    -
+      __assoc__:
+        -
+          - uid
+          - f20e4b57-aa81-46b3-afaf-be5143ef8cdf # FAQ item
+  includeTableView: false
+  maxEntries: null
+  minEntries: null
+  pageSize: null
+  propagationKeyFormat: null
+  propagationMethod: all
+  showCardsInGrid: false
+  viewMode: blocks
+translationKeyFormat: null
+translationMethod: site
+type: craft\fields\Matrix

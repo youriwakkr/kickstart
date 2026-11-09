@@ -1,0 +1,60 @@
+allowLineBreaksInTitles: false
+color: null
+description: null
+fieldLayouts:
+  19665066-6af8-4851-be2b-693fd80c9cf1:
+    cardThumbAlignment: end
+    tabs:
+      -
+        elementCondition: null
+        elements:
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: 24ac6a0f-7bc3-4c7a-b3fd-16a05faff3a1 # Heading
+            handle: null
+            instructions: null
+            label: null
+            oldFieldUid: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 66e60e1b-4e06-49f9-a7d2-b24f75ac7eb7
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            dateAdded: null
+            editCondition: null
+            elementCondition: null
+            elementEditCondition: null
+            fieldUid: ed8c76c0-6102-486e-ab00-69bda4eff8fa # Images
+            handle: null
+            instructions: null
+            label: null
+            oldFieldUid: null
+            required: true
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 92fec825-c921-4033-8130-cefecf400992
+            userCondition: null
+            warning: null
+            width: 100
+        name: Content
+        uid: 923341ff-b59c-4110-8d79-b6a34c8582d6
+        userCondition: null
+    thumbFieldKey: null
+handle: pbGallery
+hasTitleField: false
+icon: images
+name: Gallery
+showSlugField: false
+showStatusField: true
+slugTranslationKeyFormat: null
+slugTranslationMethod: site
+titleFormat: null
+titleTranslationKeyFormat: null
+titleTranslationMethod: site
+uiLabelFormat: '{heading}'

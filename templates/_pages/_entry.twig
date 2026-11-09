@@ -1,0 +1,5 @@
+{% extends '_layouts/_layout.twig' %}
+
+{% block content %}
+  {% include '_partials/pagebuilder.twig' with { entry: entry ?? null } only %}
+{% endblock %}

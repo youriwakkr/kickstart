@@ -1,0 +1,27 @@
+{# Call to action: heading, simpleTexteditor, button #}
+<section class="my-16 first:mt-0 rounded-2xl bg-zinc-900 px-8 py-14 text-center sm:px-12">
+  <div class="mx-auto max-w-2xl space-y-6">
+    <h2 class="text-2xl font-light tracking-tight text-white sm:text-3xl text-balance">
+      {{ block.heading }}
+    </h2>
+
+    {% if block.simpleTexteditor %}
+      <div class="rich-text rich-text-invert">
+        {{ block.simpleTexteditor }}
+      </div>
+    {% endif %}
+
+    {% if block.button and block.button.url %}
+      <div class="pt-2">
+        <a
+          href="{{ block.button.url }}"
+          class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+          {% if block.button.target %}target="{{ block.button.target }}"{% endif %}
+          {% if block.button.target == '_blank' %}rel="noopener noreferrer"{% endif %}
+        >
+          {{ block.button.label }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>

@@ -1,0 +1,28 @@
+{# FAQ: heading, faqItems (nested entries: title = question, answer) #}
+{% set items = block.faqItems.all() %}
+
+{% if items|length %}
+  <section class="my-16 first:mt-0 max-w-3xl space-y-8">
+    {% if block.heading %}
+      <h2 class="text-2xl font-light tracking-tight text-zinc-900 sm:text-3xl text-balance">
+        {{ block.heading }}
+      </h2>
+    {% endif %}
+
+    <div class="divide-y divide-zinc-200 border-y border-zinc-200">
+      {% for item in items %}
+        <details class="group py-5">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-base font-medium text-zinc-900 [&::-webkit-details-marker]:hidden">
+            {{ item.title }}
+            <svg class="size-5 shrink-0 text-zinc-400 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/>
+            </svg>
+          </summary>
+          <div class="rich-text pt-4">
+            {{ item.answer }}
+          </div>
+        </details>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}

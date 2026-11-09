@@ -1,0 +1,19 @@
+{#
+  Renders an entry's pagebuilder blocks. Each block uses the template
+  _components/<entry type handle>.twig (e.g. _components/pbHero.twig).
+
+  Expects: entry (Entry|null)
+  Passes to each block: block (Entry), isFirst (bool) so the first block can load its image eagerly (LCP).
+#}
+{% if entry and entry.pagebuilder is defined %}
+  {% set blocks = entry.pagebuilder
+    .with(['image', 'images', 'faqItems'])
+    .all() %}
+
+  {% for block in blocks %}
+    {% include '_components/' ~ block.type.handle ~ '.twig' ignore missing with {
+      block: block,
+      isFirst: loop.first
+    } only %}
+  {% endfor %}
+{% endif %}
