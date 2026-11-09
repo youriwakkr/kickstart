@@ -17,40 +17,66 @@ A starter project for new Craft CMS 5 websites. Copy it, rename a few things, an
 | Node | 24 (via DDEV) |
 | Asset bundler | Vite 8 + `nystudio107/craft-vite` |
 | CSS | Tailwind CSS 4 (`@tailwindcss/vite`) |
+| Rich text | CKEditor 5 (`craftcms/ckeditor`) |
+| Performance | `web-vitals` 6 (Core Web Vitals measurement) |
 | Dev tools | `craftcms/generator`, `yiisoft/yii2-shell`, Prettier |
 
 ### Local environment (DDEV)
 
 - Vite runs automatically as a DDEV daemon (`npm install && npm run dev`) on ports `3000` (HTTP) and `3001` (HTTPS). You don't need to start it yourself.
 - On every `ddev start`, DDEV runs `composer install` and `./craft up`, which applies migrations and project config.
+- DDEV provides the database settings (`CRAFT_DB_*`) itself, so they're commented out in `.env.example`.
 
 ### Craft configuration
 
-- **`config/general.php`**: Monday as the week start, no `index.php` in URLs, preloaded singles, user-enumeration protection, no front-end login page, and the Twig sandbox turned on. Dev mode and admin changes are controlled from `.env`.
+- **`config/general.php`**:
+  - Monday as the week start, no `index.php` in URLs, preloaded singles, user-enumeration protection, no front-end login page, and the Twig sandbox turned on.
+  - Dev mode and admin changes are controlled from `.env`.
+  - `disallowRobots` defaults to `true`: crawlers are blocked unless `CRAFT_DISALLOW_ROBOTS=false` is set (production only).
+- **`config/custom.php`**: project settings read from `.env`, available in Twig as `craft.app.config.custom.<key>`. It currently holds `gtmId` (from `GTM_ID`).
 - **`config/vite.php`**: uses the dev server when `CRAFT_ENVIRONMENT=dev`, and the built manifest in `web/dist/` otherwise.
 - **`config/app.php`**: the app ID comes from `CRAFT_APP_ID`.
+- **`.env.example`**: one template for every environment. Its defaults are for local development, and a table at the top shows which values to change on staging and production. Composer copies it to `.env` when the project is first created.
+
+### Content model (project config)
+
 - **Sites**: two sites in one site group:
   - `Nederlands` (`nl-NL`): the primary site, at `$PRIMARY_SITE_URL`
   - `English` (`en`): at `$PRIMARY_SITE_URL_EN`
-- **Volume**: `Images volume`, served from `$PRIMARY_SITE_UPLOADS_URL` (`web/uploads/`).
+- **Sections**:
+  - `Homepage`: a single at `__home__`, using the template `homepage/index.twig`
+  - `Pages`: a channel at `{slug}`, using the template `_pages/_entry.twig`
+- **Entry type**: `Page`, used by both sections.
+- **Volume**: `Images volume`, served from `$PRIMARY_SITE_UPLOADS_URL` (`web/uploads/`, which git ignores).
 - **Tag group**: `Blog tags`.
-- **Environment templates**: `.env.example.dev`, `.env.example.staging` and `.env.example.production`. Composer copies `.env.example.dev` to `.env` when the project is first created.
+- **Rich text field** `texteditor` (CKEditor):
+  - Toolbar: headings H2 to H4, bold, italic, links, bulleted and numbered lists, blockquote, horizontal line, remove formatting, and source editing (admins only). H1 is left out because it's reserved for the page title.
+  - `config/ckeditor/default.json` holds the CKEditor options: an "Open in a new tab" checkbox on links (adds `target="_blank" rel="noopener noreferrer"`), `https://` as the default link protocol, and a start number for numbered lists. To give another field its own setup, add a JSON file next to it and choose it in that field's settings.
+  - `config/htmlpurifier/Default.json` cleans the saved HTML. It allows `rel="noopener noreferrer nofollow"`, strips inline `style` attributes, and only allows YouTube and Vimeo iframes.
+  - Output it with `{{ entry.texteditor }}`. The value is already purified, so `|raw` isn't needed.
 
 ### Templates
 
 ```
 templates/
-├── _layouts/_layout.twig            # Base HTML layout: header, nav, footer, hreflang tags, Vite script
+├── _layouts/_layout.twig            # Base HTML: <head> (GTM, SEO partial, SEOMate hook, Vite), header, <main>, footer
+├── _partials/header.twig            # Site header, main nav, language switcher, mobile nav toggle
+├── _partials/footer.twig            # Site footer
+├── _partials/seo-head.twig          # Fallback <title>, canonical + hreflang (skipped when SEOmatic/SEOMate is enabled)
 ├── _partials/language-switcher.twig # NL / EN switcher that links to the same entry on the other site
-├── _components/                     # Page-builder blocks (pbContent, pbQuote)
+├── _components/                     # Example page-builder components (pbContent, pbQuote)
 ├── _macros/picture.twig             # Responsive, multi-format <picture> macro
 ├── _macros/picture-HOW-TO.twig      # Examples for the picture macro (full width, 2 and 3 columns)
 ├── _emails/                         # Custom system emails (base layout + reset password)
-├── _blogs/                          # Example blog overview and blog entry templates
-└── homepage/index.twig              # Example homepage with page-builder loop
+├── _samples/                        # Optional files to copy in per project (e.g. per plugin)
+│   └── seomate/robots.txt.twig      # robots.txt for projects using SEOMate
+├── _blogs/                          # Example blog overview and blog entry templates (no blog section yet)
+└── homepage/index.twig              # Homepage template
 ```
 
-Page-builder blocks are rendered by entry type handle:
+Folders starting with `_` can't be opened directly as URLs.
+
+**Page-builder components:** the kickstart doesn't have a page-builder (Matrix) field yet. Once you add one, render its blocks by entry type handle, with a matching template in `_components/`:
 
 ```twig
 {% for block in entry.pagebuilder.all() %}
@@ -58,11 +84,152 @@ Page-builder blocks are rendered by entry type handle:
 {% endfor %}
 ```
 
+**Page title:** while no SEO plugin is installed, `seo-head.twig` outputs "Entry title | System name". The homepage and pages without an entry show just the system name, which you set under **Settings → General → System Name**.
+
+### Translations
+
+Static translations live in `translations/<language>/site.php`:
+
+- `translations/en/site.php`: English
+- `translations/nl/site.php`: Dutch (also used for the `nl-NL` site)
+
+Use them in Twig with the `t` filter: `{{ 'Read more'|t }}`. Add each new key to both files.
+
 ### Front-end
 
-- `src/js/app.js` is the Vite entry point. It imports `src/css/app.css`.
-- `src/css/app.css` imports Tailwind and scans `templates/**/*.{twig,html}` for classes.
+- `src/js/app.js` is the Vite entry point. It imports `src/css/app.css` and `src/js/web-vitals.js`.
+- `src/css/app.css` imports Tailwind 4 and scans `templates/**/*.{twig,html}` for classes. Tailwind is configured in this CSS file (`@theme`, `@source`), so there's no `tailwind.config.js`.
 - The production build goes to `web/dist/`, which git ignores.
+- `src/js/web-vitals.js` measures Core Web Vitals (LCP, INP, CLS, plus FCP and TTFB). On the Vite dev server it logs them to the browser console. In the production build it pushes them to the GTM `dataLayer` as a `web_vitals` event, but only when GTM is loaded. Otherwise nothing is sent.
+
+### Google Tag Manager
+
+GTM is built into `_layouts/_layout.twig`, but it only loads when `GTM_ID` is set in `.env` (for example `GTM_ID=GTM-XXXXXXX`). Leave it empty to turn GTM off. Usually only production sets it. The value reaches Twig through `config/custom.php`.
+
+To send Web Vitals to GA4: in GTM, create a **Custom Event** trigger on `web_vitals`, plus a GA4 event tag that sends `metric_name`, `metric_value` and `metric_rating` as event parameters.
+
+> For Dutch and EU visitors, GTM and GA need visitor consent before they track anything (GDPR / AVG). Add a cookie banner with Google Consent Mode before setting `GTM_ID` on a live site.
+
+### Editor settings
+
+- `.prettierrc`: Prettier with default settings.
+- `.vscode/settings.json` treats `robots.txt.twig` files as plain text, so the Twig formatter doesn't indent their output lines when you save.
+
+---
+
+## robots.txt and sitemap (SEO plugin)
+
+The kickstart doesn't include a robots.txt or a sitemap. Each project gets one of two SEO plugins, SEOmatic or SEOMate, so pick one of the setups below.
+
+Both setups follow the same rule: crawlers are only allowed when `CRAFT_DISALLOW_ROBOTS=false`, which you only set on production. `config/general.php` defaults `disallowRobots` to `true`, so if the variable is missing, crawlers are blocked. When robots are disallowed, Craft also sends an `X-Robots-Tag: none` header on every page.
+
+> Never add a static `web/robots.txt`. The web server serves it before Craft, so the plugin's version would never show up.
+
+> These templates haven't been tested in this kickstart yet. After installing a plugin, compare them with its default template and check `/robots.txt` on dev and production.
+
+### Option A: SEOmatic (`nystudio107/craft-seomatic`)
+
+```sh
+ddev composer require nystudio107/craft-seomatic
+ddev craft plugin/install seomatic
+```
+
+**1. Map Craft's environment to SEOmatic's.** SEOmatic uses its own environment names (`live`, `staging`, `local`), which also decide whether pages get `noindex` meta tags. Create `config/seomatic.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use craft\helpers\App;
+
+return [
+    'environment' => match (App::env('CRAFT_ENVIRONMENT')) {
+        'production' => 'live',
+        'staging' => 'staging',
+        default => 'local',
+    },
+];
+```
+
+**2. Replace the robots.txt template.** Paste this into SEOmatic's robots.txt template setting in the control panel:
+
+```twig
+{% if not craft.app.config.general.disallowRobots %}
+User-agent: *
+Disallow: /cpresources/
+Disallow: /vendor/
+Disallow: /.env
+
+Sitemap: {{ seomatic.helper.sitemapIndexForSiteId() }}
+{% for site in craft.app.sites.allSites %}
+{% if site.id != currentSite.id %}
+Sitemap: {{ seomatic.helper.sitemapIndexForSiteId(site.id) }}
+{% endif %}
+{% endfor %}
+{% else %}
+User-agent: *
+Disallow: /
+{% endif %}
+```
+
+SEOmatic's sitemap is at `/sitemaps-1-sitemap.xml`, not `/sitemap.xml`. The helper above outputs the correct URL for each site (NL and EN).
+
+### Option B: SEOMate (`vaersaagod/seomate`)
+
+```sh
+ddev composer require vaersaagod/seomate
+ddev craft plugin/install seomate
+```
+
+SEOMate generates the sitemap, but it doesn't serve a robots.txt. Use a Twig template for robots.txt instead.
+
+**1. Turn on the sitemap.** Create `config/seomate.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+return [
+    'sitemapEnabled' => true,
+    'sitemapName' => 'sitemap', // Served at /sitemap.xml
+    'sitemapConfig' => [
+        // Add the sections to include, e.g.:
+        // 'blogEntries' => ['changefreq' => 'weekly', 'priority' => 0.5],
+    ],
+];
+```
+
+**2. Copy the sample robots.txt template:**
+
+```sh
+cp templates/_samples/seomate/robots.txt.twig templates/robots.txt.twig
+```
+
+Craft serves it at `/robots.txt` as `text/plain`, because it picks the content type from the `.txt` extension. If you change `sitemapName`, update the `Sitemap:` line to match. `.vscode/settings.json` maps `robots.txt.twig` files to plain text, so the Twig formatter won't indent the output lines on save.
+
+---
+
+## Plugins we normally use
+
+These plugins aren't included in the kickstart, except CKEditor. This list is for reference: install them per project as needed.
+
+| Purpose | Free | Paid |
+| --- | --- | --- |
+| Mailing | Postmark | – |
+| Forms | Contact Form + extensions | Formie, Freeform |
+| SEO | SEOMate | SEOmatic |
+| Mega menu | – | Navigation |
+| Translations | – | Multi Translator |
+| Cache | – | Blitz |
+| reCAPTCHA | Contact Form reCAPTCHA | – |
+| Redirects | Redirect Manager | Retour |
+| Cookie banner | – | – |
+| Content import | – | Feed Me |
+| Text editor | CKEditor (already installed) | – |
+
+For setting up SEOmatic or SEOMate, see [robots.txt and sitemap (SEO plugin)](#robotstxt-and-sitemap-seo-plugin).
 
 ---
 
@@ -82,7 +249,7 @@ git init
 ### 2. Remove project-specific files
 
 ```sh
-rm -f config/license.key config/license.key.1   # Every Craft project needs its own license
+rm -f config/license.key config/license.key.1   # Every Craft project needs its own license (Craft creates a new one)
 rm -rf web/uploads/*                             # Example images
 rm -f .env                                       # It's created again in step 4
 ```
@@ -92,23 +259,27 @@ rm -f .env                                       # It's created again in step 4
 | File | What to change |
 | --- | --- |
 | `.ddev/config.yaml` | `name: CraftCMStest` → `name: my-project` |
-| `vite.config.js` | `"craftcmstest.ddev.site"` in the allowed hosts → `"my-project.ddev.site"` |
+| `vite.config.js` | `"craftcmstest.ddev.site"` in `allowedHosts` → `"my-project.ddev.site"` |
 | `package.json` | `"name": "craftcmstest"` → `"name": "my-project"` |
-| `templates/_layouts/_layout.twig` | Site name, logo, navigation, footer text, social links and email address |
+| `templates/_partials/header.twig` | Logo, site name and navigation |
+| `templates/_partials/footer.twig` | Footer text, social links and email address |
+| Control panel: **Settings → General** | System name (used in the page `<title>`) and the email settings |
 
 ### 4. Create the `.env` file
 
 ```sh
-cp .env.example.dev .env
+cp .env.example .env
 ```
 
-Add the site URLs to `.env`. DDEV already provides the database settings.
+The defaults are already set for local development. Replace `website` in the three site URLs with the project's name:
 
 ```dotenv
-PRIMARY_SITE_URL=https://my-project.ddev.site
-PRIMARY_SITE_URL_EN=https://my-project.ddev.site/en
 PRIMARY_SITE_UPLOADS_URL=https://my-project.ddev.site/uploads
+PRIMARY_SITE_URL=https://my-project.ddev.site/
+PRIMARY_SITE_URL_EN=https://my-project.ddev.site/en/
 ```
+
+DDEV provides the database settings, so leave them commented out. Leave `GTM_ID` empty locally.
 
 ### 5. Start DDEV and install Craft
 
@@ -150,12 +321,18 @@ git commit -m "Initial commit from Craft CMS kickstart"
 | Build front-end assets for production | `ddev npm run build` |
 | Export the database | `ddev export-db --file=db.sql.gz` |
 | Import a database | `ddev import-db --file=db.sql.gz` |
+| Take a database snapshot (before big changes) | `ddev snapshot --name=<name>` |
+| Restore a snapshot | `ddev snapshot restore <name>` |
 
 ---
 
 ## Deploying
 
-1. Create `.env` on the server from `.env.example.staging` or `.env.example.production`, and fill in the database settings, app ID, security key and site URLs.
+1. Create `.env` on the server from `.env.example`:
+   - Set the values for that environment, using the table at the top of the file.
+   - Uncomment and fill in the database settings.
+   - Fill in the app ID, security key and site URLs.
+   - Set `GTM_ID` if the site uses GTM.
 2. Run `composer install --no-dev`.
 3. Run `npm ci && npm run build`.
 4. Run `php craft up`.

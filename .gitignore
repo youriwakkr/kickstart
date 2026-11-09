@@ -51,3 +51,6 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 .claude/settings.local.json
+
+# Craft license: every project gets its own (Craft creates a new one)
+/config/license.key*

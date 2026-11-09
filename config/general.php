@@ -29,6 +29,8 @@ return GeneralConfig::create()
     ->allowAdminChanges(App::env('CRAFT_ALLOW_ADMIN_CHANGES') ?? false)
     // Enable dev mode in development
     ->devMode(App::env('CRAFT_DEV_MODE') ?? false)
+    // Block crawlers (robots.txt + X-Robots-Tag header) unless CRAFT_DISALLOW_ROBOTS=false is set explicitly (production)
+    ->disallowRobots(App::env('CRAFT_DISALLOW_ROBOTS') ?? true)
     // Set the @webroot alias so the clear-caches command knows where to find CP resources
     ->aliases([
         '@webroot' => dirname(__DIR__) . '/web',

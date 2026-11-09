@@ -1,0 +1,23 @@
+{
+  "link": {
+    "addTargetToExternalLinks": false,
+    "defaultProtocol": "https://",
+    "decorators": {
+      "openInNewTab": {
+        "mode": "manual",
+        "label": "Open in a new tab",
+        "attributes": {
+          "target": "_blank",
+          "rel": "noopener noreferrer"
+        }
+      }
+    }
+  },
+  "list": {
+    "properties": {
+      "styles": false,
+      "startIndex": true,
+      "reversed": false
+    }
+  }
+}

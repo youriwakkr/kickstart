@@ -2,7 +2,15 @@
   "Attr.AllowedFrameTargets": [
     "_blank"
   ],
+  "Attr.AllowedRel": [
+    "noopener",
+    "noreferrer",
+    "nofollow"
+  ],
   "Attr.EnableID": true,
+  "HTML.ForbiddenAttributes": [
+    "*@style"
+  ],
   "HTML.AllowedComments": [
     "pagebreak"
   ],

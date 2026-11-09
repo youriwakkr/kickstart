@@ -1,0 +1,27 @@
+{#
+  SAMPLE: robots.txt for projects using SEOMate (vaersaagod/seomate).
+  SEOMate generates the sitemap but doesn't serve a robots.txt, so this template does.
+
+  To use it: copy to templates/robots.txt.twig
+    cp templates/_samples/seomate/robots.txt.twig templates/robots.txt.twig
+
+  Craft serves templates/robots.txt.twig at /robots.txt as text/plain (the content type comes from the .txt extension).
+
+  Crawlers are only allowed when CRAFT_DISALLOW_ROBOTS=false (production).
+  config/general.php defaults disallowRobots to true, so a missing value blocks crawlers.
+
+  - The Sitemap URL must match 'sitemapName' in config/seomate.php (default: sitemap → /sitemap.xml).
+  - Never add a static web/robots.txt: the web server would serve it instead of this template.
+  - Keep the output lines flush left (.vscode/settings.json maps robots.txt.twig to plaintext so the Twig formatter skips it).
+#}
+{%- if not craft.app.config.general.disallowRobots -%}
+User-agent: *
+Disallow: /cpresources/
+Disallow: /vendor/
+Disallow: /.env
+
+Sitemap: {{ siteUrl('sitemap.xml') }}
+{%- else -%}
+User-agent: *
+Disallow: /
+{%- endif %}

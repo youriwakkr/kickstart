@@ -6,81 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
     <meta name="referrer" content="origin-when-cross-origin"/>
 
-    {% if entry is defined and entry %}
-      {% for site in craft.app.sites.getAllSites() %}
-        {% set localizedEntry = craft.entries()
-          .id(entry.id)
-          .siteId(site.id)
-          .status(null)
-          .one() %}
-
-        {% if localizedEntry and localizedEntry.enabled and localizedEntry.enabledForSite %}
-          <link rel="alternate" hreflang="{{ site.language }}" href="{{ localizedEntry.getUrl() }}"/>
-        {% endif %}
-      {% endfor %}
+    {# Google Tag Manager: waiting for a container ID. Set GTM_ID=GTM-XXXXXXX in .env to enable (see config/custom.php). #}
+    {% set gtmId = craft.app.config.custom.gtmId ?? null %}
+    {% if gtmId %}
+      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ gtmId|e('js') }}');</script>
     {% endif %}
 
-    <title>{% block title %}{{ entry.title ?? 'Youri Gruiters' }}{% endblock %} | Youri Gruiters Photography</title>
+    {# Fallback <title>, canonical and hreflang. Skipped automatically once SEOmatic or SEOMate is enabled. #}
+    {% include '_partials/seo-head.twig' with { entry: entry ?? null } only %}
+
+    {# SEOMate outputs its meta tags (incl. <title>) here. Outputs nothing when SEOMate isn't installed. SEOmatic injects its tags itself. #}
+    {% hook 'seomateMeta' %}
 
     {{ craft.vite.script('src/js/app.js', false) }}
   </head>
   <body class="min-h-full flex flex-col bg-white text-zinc-800 font-sans antialiased">
+    {% if gtmId %}
+      <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ gtmId|url_encode }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    {% endif %}
 
-    <header class="w-full bg-zinc-900 text-white sticky top-0 z-50 shadow-md">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        <a href="{{ currentSite.getBaseUrl() }}" class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white shrink-0" style="width: 2rem; height: 2rem;">
-            <svg class="w-4 h-4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" style="width: 1rem; height: 1rem;">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"/>
-            </svg>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-base font-semibold tracking-widest uppercase text-white">
-              Youri Gruiters
-            </span>
-            <span class="text-[10px] tracking-wider uppercase text-zinc-400">
-              Photography
-            </span>
-          </div>
-        </a>
-
-        <nav class="hidden md:flex items-center gap-8 text-xs uppercase tracking-widest font-medium" aria-label="Main Navigation">
-          <a href="{{ currentSite.getBaseUrl() }}" class="text-zinc-300 hover:text-white transition-colors">
-            Portfolio
-          </a>
-          <a href="{{ currentSite.getBaseUrl() }}blogs" class="text-zinc-300 hover:text-white transition-colors">
-            Blogs
-          </a>
-          <a href="{{ currentSite.getBaseUrl() }}contact" class="text-zinc-300 hover:text-white transition-colors">
-            Contact
-          </a>
-        </nav>
-
-        <div class="flex items-center gap-4">
-          <div class="bg-zinc-800 px-3 py-1.5 rounded-md border border-zinc-700">
-            {% include '_partials/language-switcher.twig' ignore missing %}
-          </div>
-
-          <button
-            type="button"
-            id="mobile-nav-btn"
-            class="md:hidden p-2 text-zinc-400 hover:text-white focus:outline-none"
-            aria-label="Toggle navigation menu"
-          >
-            <svg class="w-6 h-6" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem;">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div id="mobile-nav-menu" class="hidden md:hidden bg-zinc-950 border-t border-zinc-800 px-6 py-6 space-y-4 text-xs uppercase tracking-widest font-medium">
-        <a href="{{ currentSite.getBaseUrl() }}" class="block py-2 text-zinc-300 hover:text-white">Portfolio</a>
-        <a href="{{ currentSite.getBaseUrl() }}blogs" class="block py-2 text-zinc-300 hover:text-white">Blogs</a>
-        <a href="{{ currentSite.getBaseUrl() }}contact" class="block py-2 text-zinc-300 hover:text-white">Contact</a>
-      </div>
-    </header>
+    {% include '_partials/header.twig' with { entry: entry ?? null } only %}
 
     <main class="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       {% block content %}
@@ -88,63 +33,7 @@
       {% endblock %}
     </main>
 
-    <footer class="w-full bg-zinc-900 text-zinc-300 border-t border-zinc-800 mt-auto">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-          <div class="space-y-4 md:col-span-2">
-            <div class="flex items-center gap-3">
-              <span class="text-base font-semibold tracking-widest uppercase text-white">
-                Youri Gruiters
-              </span>
-              <span class="text-xs text-zinc-500 uppercase tracking-wider">/ Studio</span>
-            </div>
-            <p class="text-sm text-zinc-400 font-light leading-relaxed max-w-md">
-              Specializing in medium-format landscape, architectural geometry, and editorial storytelling. Based in Amsterdam, creating worldwide.
-            </p>
-          </div>
+    {% include '_partials/footer.twig' only %}
 
-          <div class="space-y-3">
-            <h3 class="text-xs uppercase tracking-widest font-semibold text-white">Navigation</h3>
-            <ul class="space-y-2 text-sm text-zinc-400">
-              <li><a href="{{ currentSite.getBaseUrl() }}" class="hover:text-white transition-colors">Portfolio</a></li>
-              <li><a href="{{ currentSite.getBaseUrl() }}blogs" class="hover:text-white transition-colors">Blogs</a></li>
-              <li><a href="{{ currentSite.getBaseUrl() }}contact" class="hover:text-white transition-colors">Contact & Inquiries</a></li>
-            </ul>
-          </div>
-
-          <div class="space-y-3">
-            <h3 class="text-xs uppercase tracking-widest font-semibold text-white">Connect</h3>
-            <ul class="space-y-2 text-sm text-zinc-400">
-              <li><a href="https://instagram.com" target="_blank" rel="noopener" class="hover:text-white transition-colors">Instagram</a></li>
-              <li><a href="https://behance.net" target="_blank" rel="noopener" class="hover:text-white transition-colors">Behance</a></li>
-              <li><a href="mailto:studio@elenavance.photo" class="hover:text-white transition-colors">studio@elenavance.photo</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="mt-12 pt-8 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
-          <p>
-            {{ (copyrightText is defined and copyrightText.textContent) ? copyrightText.textContent : ('&copy; ' ~ now|date('Y') ~ ' Youri Gruiters Photography. All rights reserved.') }}
-          </p>
-
-          <div class="flex items-center gap-6">
-            <a href="#" class="hover:text-zinc-200 transition-colors">Privacy Policy</a>
-            <a href="#" class="hover:text-zinc-200 transition-colors">Terms of Work</a>
-          </div>
-        </div>
-      </div>
-    </footer>
-
-    <script>
-      (function () {
-        const btn = document.getElementById("mobile-nav-btn");
-        const menu = document.getElementById("mobile-nav-menu");
-        if (btn && menu) {
-          btn.addEventListener("click", function () {
-            menu.classList.toggle("hidden");
-          });
-        }
-      })();
-    </script>
   </body>
 </html>

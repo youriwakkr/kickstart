@@ -15,5 +15,8 @@
     "@tailwindcss/vite": "^4.3.4",
     "tailwindcss": "^4.3.4",
     "vite": "^8.3.5"
+  },
+  "dependencies": {
+    "web-vitals": "^6.2.3"
   }
 }

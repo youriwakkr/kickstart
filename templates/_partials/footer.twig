@@ -1,0 +1,46 @@
+<footer class="w-full bg-zinc-900 text-zinc-300 border-t border-zinc-800 mt-auto">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div class="space-y-4 md:col-span-2">
+        <div class="flex items-center gap-3">
+          <span class="text-base font-semibold tracking-widest uppercase text-white">
+            Youri Gruiters
+          </span>
+          <span class="text-xs text-zinc-500 uppercase tracking-wider">/ Studio</span>
+        </div>
+        <p class="text-sm text-zinc-400 font-light leading-relaxed max-w-md">
+          Specializing in medium-format landscape, architectural geometry, and editorial storytelling. Based in Amsterdam, creating worldwide.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="text-xs uppercase tracking-widest font-semibold text-white">Navigation</h3>
+        <ul class="space-y-2 text-sm text-zinc-400">
+          <li><a href="{{ currentSite.getBaseUrl() }}" class="hover:text-white transition-colors">Portfolio</a></li>
+          <li><a href="{{ currentSite.getBaseUrl() }}blogs" class="hover:text-white transition-colors">Blogs</a></li>
+          <li><a href="{{ currentSite.getBaseUrl() }}contact" class="hover:text-white transition-colors">Contact & Inquiries</a></li>
+        </ul>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="text-xs uppercase tracking-widest font-semibold text-white">Connect</h3>
+        <ul class="space-y-2 text-sm text-zinc-400">
+          <li><a href="https://instagram.com" target="_blank" rel="noopener" class="hover:text-white transition-colors">Instagram</a></li>
+          <li><a href="https://behance.net" target="_blank" rel="noopener" class="hover:text-white transition-colors">Behance</a></li>
+          <li><a href="mailto:studio@elenavance.photo" class="hover:text-white transition-colors">studio@elenavance.photo</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-12 pt-8 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
+      <p>
+        {{ (copyrightText is defined and copyrightText.textContent) ? copyrightText.textContent : ('&copy; ' ~ now|date('Y') ~ ' Youri Gruiters Photography. All rights reserved.') }}
+      </p>
+
+      <div class="flex items-center gap-6">
+        <a href="#" class="hover:text-zinc-200 transition-colors">Privacy Policy</a>
+        <a href="#" class="hover:text-zinc-200 transition-colors">Terms of Work</a>
+      </div>
+    </div>
+  </div>
+</footer>

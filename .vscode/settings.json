@@ -1,0 +1,7 @@
+{
+  // robots.txt templates output plain text: treat them as plaintext so the
+  // Twig formatter doesn't indent the output lines on save.
+  "files.associations": {
+    "**/robots.txt.twig": "plaintext"
+  }
+}

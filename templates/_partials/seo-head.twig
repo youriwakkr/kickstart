@@ -1,0 +1,41 @@
+{#
+  Basic SEO head tags: canonical + hreflang alternates.
+
+  Skipped automatically when SEOmatic or SEOMate is enabled: both plugins output
+  these tags themselves, and duplicate canonical/hreflang tags confuse search engines.
+
+  Expects: entry (Entry|null)
+#}
+{%- set plugins = craft.app.plugins -%}
+{%- if not plugins.isPluginEnabled('seomatic') and not plugins.isPluginEnabled('seomate') -%}
+  {%- set pageNum = craft.app.request.pageNum -%}
+
+  {# Title: "Entry title | System name" (Settings → General → System Name).
+     The homepage and pages without an entry show just the system name. #}
+  {%- set systemName = craft.app.systemName -%}
+  {%- set isHome = entry and entry.uri == '__home__' -%}
+  <title>{{ (entry and not isHome) ? entry.title ~ ' | ' ~ systemName : systemName }}</title>
+
+  {# Canonical: the entry's own URL, or the current URL (without query string) for other pages and paginated pages #}
+  {%- set canonicalUrl = (entry and entry.url and pageNum == 1)
+    ? entry.url
+    : craft.app.request.absoluteUrl|split('?')|first -%}
+  <link rel="canonical" href="{{ canonicalUrl }}"/>
+
+  {# hreflang: one link per site where this entry is live, plus x-default (primary site). Skipped on paginated pages. #}
+  {%- set sites = craft.app.sites.getAllSites() -%}
+  {%- if entry and pageNum == 1 and sites|length > 1 -%}
+    {%- set localizedEntries = craft.entries()
+      .id(entry.id)
+      .site('*')
+      .unique(false)
+      .all() -%}
+
+    {%- for localized in localizedEntries|filter(e => e.url) %}
+  <link rel="alternate" hreflang="{{ localized.site.language }}" href="{{ localized.url }}"/>
+      {%- if localized.site.primary %}
+  <link rel="alternate" hreflang="x-default" href="{{ localized.url }}"/>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endif -%}
