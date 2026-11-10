@@ -1,0 +1,150 @@
+# CI/CD for this Craft CMS project.
+#
+#   frontend  Build the Vite assets (web/dist/).
+#   backend   Validate, audit and install the Composer dependencies (vendor/).
+#   craft     staging and production only: upload the build to the server and run `craft up`.
+#
+# Branches:
+#   staging     build + deploy to https://staging.<SITE_DOMAIN>
+#   production  build + deploy to https://<SITE_DOMAIN>
+#   Pull requests into staging or production get the builds only, so problems show up before merging.
+#
+# Setup in GitHub (Settings → Secrets and variables → Actions, and Settings → Environments):
+#   Repository variable  SITE_DOMAIN       e.g. website.com
+#   Environments         staging, production, each with these secrets:
+#     SSH_HOST           Server hostname or IP
+#     SSH_USER           SSH user that owns the site files
+#     SSH_PRIVATE_KEY    Private key whose public key is in the server's authorized_keys
+#     SSH_KNOWN_HOSTS    Output of `ssh-keyscan <host>`
+#     DEPLOY_PATH        Project root on the server (the folder that contains `craft`)
+#
+# The server keeps its own .env, storage/ and web/uploads/: the deploy never touches them.
+# PHP and Node.js versions match .ddev/config.yaml. Keep them in sync (and with the server).
+
+name: CI
+
+on:
+  push:
+    branches: [staging, production]
+  pull_request:
+    branches: [staging, production]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel superseded pull request runs, but never a deploy that's in progress
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "24"
+  PHP_VERSION: "8.4"
+
+jobs:
+  frontend:
+    name: FE build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: web/dist/
+          # The Vite manifest lives in web/dist/.vite/, which is skipped by default
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+  backend:
+    name: BE build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: bcmath, curl, dom, gd, intl, mbstring, pdo_mysql, zip
+          tools: composer:v2
+          coverage: none
+
+      # Fails when composer.lock is out of sync with composer.json
+      - run: composer validate --no-check-publish
+
+      # Fails when an installed package has a known security advisory
+      - run: composer audit --locked --no-dev --abandoned=report
+
+      - run: composer install --no-dev --prefer-dist --no-interaction --no-progress
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vendor
+          path: vendor/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+  craft:
+    name: Craft deploy (${{ github.ref_name }})
+    needs: [frontend, backend]
+    if: github.event_name == 'push' && (github.ref_name == 'staging' || github.ref_name == 'production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: ${{ github.ref_name }}
+      url: https://${{ github.ref_name == 'staging' && 'staging.' || '' }}${{ vars.SITE_DOMAIN }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: web/dist/
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: vendor
+          path: vendor/
+
+      - name: Set up SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_deploy ~/.ssh/known_hosts
+
+      # --delete removes files that were deleted from the repo. Excluded paths are never deleted.
+      - name: Upload files
+        env:
+          SSH_TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
+        run: >-
+          rsync -az --delete
+          -e "ssh -i ~/.ssh/id_deploy"
+          --exclude=/.git/ --exclude=/.github/ --exclude=/.ddev/ --exclude=/.vscode/
+          --exclude=/node_modules/ --exclude=/src/
+          --exclude=.env --exclude=/storage/ --exclude=/config/license.key
+          --exclude=/web/uploads/ --exclude=/web/cpresources/
+          ./ "$SSH_TARGET"
+
+      - name: Run craft up
+        env:
+          SSH_TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: ssh -i ~/.ssh/id_deploy "$SSH_TARGET" "cd '$DEPLOY_PATH' && php craft up --interactive=0"
