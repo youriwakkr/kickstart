@@ -1,4 +1,9 @@
-{# Content from Globals → Navigation (footerNavigation) and Globals → Site settings #}
+{#
+  Content from Globals → Navigation (footerNavigation) and Globals → Site settings.
+  Cached per site: Craft clears the cache when a page, the navigation or the site settings are saved.
+  'for 1 day' keeps the copyright year current.
+#}
+{% cache globally using key 'footer' for 1 day %}
 {% set footerPages = navigation.footerNavigation.all() ?? [] %}
 {% set brandName = siteSettings.companyName ?? null ?: 'Kickstart' %}
 {% set footerText = siteSettings.footerText ?? null %}
@@ -25,12 +30,12 @@
           {% if address %}
             <address class="not-italic leading-relaxed">{{ address|address }}</address>
           {% endif %}
-          <ul class="space-y-1" role="list">
+          <ul role="list">
             {% if phone %}
-              <li><a href="tel:{{ phone|replace('/[^0-9+]/', '') }}" class="transition-colors hover:text-zinc-900">{{ phone }}</a></li>
+              <li><a href="tel:{{ phone|replace('/[^0-9+]/', '') }}" class="inline-block py-1 transition-colors hover:text-zinc-900">{{ phone }}</a></li>
             {% endif %}
             {% if email %}
-              <li><a href="mailto:{{ email }}" class="transition-colors hover:text-zinc-900">{{ email }}</a></li>
+              <li><a href="mailto:{{ email }}" class="inline-block py-1 transition-colors hover:text-zinc-900">{{ email }}</a></li>
             {% endif %}
           </ul>
         </div>
@@ -38,10 +43,10 @@
 
       {% if footerPages|length %}
         <nav aria-label="{{ 'Footer navigation'|t }}" class="md:justify-self-end">
-          <ul class="space-y-2 text-sm" role="list">
+          <ul class="space-y-1 text-sm" role="list">
             {% for page in footerPages %}
               <li>
-                <a href="{{ page.url }}" class="text-zinc-500 transition-colors hover:text-zinc-900">{{ page.title }}</a>
+                <a href="{{ page.url }}" class="inline-block py-1 text-zinc-500 transition-colors hover:text-zinc-900">{{ page.title }}</a>
               </li>
             {% endfor %}
           </ul>
@@ -49,9 +54,10 @@
       {% endif %}
     </div>
 
-    <div class="mt-10 flex flex-col gap-2 border-t border-zinc-200 pt-6 text-xs text-zinc-400 sm:flex-row sm:items-center sm:justify-between">
+    <div class="mt-10 flex flex-col gap-2 border-t border-zinc-200 pt-6 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
       <p>&copy; {{ now|date('Y') }} {{ brandName }}</p>
       <p>Built with Craft CMS</p>
     </div>
   </div>
 </footer>
+{% endcache %}

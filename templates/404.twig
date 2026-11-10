@@ -1,0 +1,31 @@
+{#
+  404 page. Craft renders this template (with a 404 status) when no route or entry matches the URL.
+  With dev mode on, Craft shows its debug error page for some errors instead. Set CRAFT_DEV_MODE=false to test this page.
+#}
+{% extends '_layouts/_layout.twig' %}
+
+{% set pageTitle = 'Page not found'|t %}
+{% set noindex = true %}
+
+{% block content %}
+  <section class="max-w-2xl space-y-6 py-8 sm:py-16">
+    <p class="text-sm font-medium tracking-wide text-zinc-500 uppercase">{{ 'Error 404'|t }}</p>
+
+    <h1 class="text-4xl font-light tracking-tight text-zinc-900 sm:text-5xl text-balance">
+      {{ 'Page not found'|t }}
+    </h1>
+
+    <p class="text-lg font-light leading-relaxed text-zinc-600 text-pretty">
+      {{ 'The page you’re looking for doesn’t exist or has been moved.'|t }}
+    </p>
+
+    <div class="pt-2">
+      <a
+        href="{{ siteUrl() }}"
+        class="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+      >
+        {{ 'Back to the homepage'|t }}
+      </a>
+    </div>
+  </section>
+{% endblock %}

@@ -1,19 +1,40 @@
+{#
+  Base layout.
+
+  Optional variables a child template can set (before or outside its blocks):
+  - pageTitle (String) Overrides the <title> when there's no entry (e.g. '404.twig')
+  - noindex   (Bool)   Adds <meta name="robots" content="noindex"> and skips canonical/hreflang
+#}
+{%- set noindex = noindex ?? false -%}
 <!DOCTYPE html>
-<html lang="{{ currentSite.language ?? 'en' }}" class="h-full scroll-smooth">
+<html lang="{{ currentSite.language ?? 'en' }}" class="h-full scroll-pt-20 motion-safe:scroll-smooth">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
     <meta name="referrer" content="origin-when-cross-origin"/>
 
     {# Google Tag Manager: waiting for a container ID. Set GTM_ID=GTM-XXXXXXX in .env to enable (see config/custom.php). #}
     {% set gtmId = craft.app.config.custom.gtmId ?? null %}
+    {# Loader: src/js/gtm.js (reads the ID from data-gtm-id) #}
     {% if gtmId %}
-      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ gtmId|e('js') }}');</script>
+      {{ craft.vite.script('src/js/gtm.js', false, { async: true, 'data-gtm-id': gtmId }) }}
     {% endif %}
 
-    {# Fallback <title>, canonical and hreflang. Skipped automatically once SEOmatic or SEOMate is enabled. #}
-    {% include '_partials/seo-head.twig' with { entry: entry ?? null } only %}
+    {% if noindex %}
+      <meta name="robots" content="noindex"/>
+    {% endif %}
+
+    {# Fallback <title>, description, canonical, hreflang and Open Graph. Skipped automatically once SEOmatic or SEOMate is enabled. #}
+    {% include '_partials/seo-head.twig' with {
+      entry: entry ?? null,
+      pageTitle: pageTitle ?? null,
+      noindex: noindex
+    } only %}
+
+    {# JSON-LD (Organization/WebSite on the homepage, BreadcrumbList on pages). Skipped when SEOmatic is enabled. #}
+    {% if not noindex %}
+      {% include '_partials/schema.twig' with { entry: entry ?? null } only %}
+    {% endif %}
 
     {# SEOMate outputs its meta tags (incl. <title>) here. Outputs nothing when SEOMate isn't installed. SEOmatic injects its tags itself. #}
     {% hook 'seomateMeta' %}
@@ -25,9 +46,14 @@
       <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ gtmId|url_encode }}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     {% endif %}
 
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-60 focus:rounded-md focus:bg-zinc-900 focus:px-4 focus:py-2.5 focus:text-sm focus:font-medium focus:text-white"
+    >{{ 'Skip to content'|t }}</a>
+
     {% include '_partials/header.twig' with { entry: entry ?? null } only %}
 
-    <main class="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <main id="main" tabindex="-1" class="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 focus:outline-none">
       {% block content %}
 
       {% endblock %}

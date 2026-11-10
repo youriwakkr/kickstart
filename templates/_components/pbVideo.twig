@@ -1,16 +1,21 @@
 {#
   Video: videoUrl (YouTube or Vimeo), optional poster image.
   With a poster, the player only loads (and connects to YouTube/Vimeo) after the visitor clicks play.
+  YouTube videos without a poster use YouTube's own thumbnail, so they also load on click.
+  Vimeo videos without a poster embed the player directly (Vimeo has no public thumbnail URL).
 #}
 {% import '_macros/picture.twig' as ui %}
 
 {% set url = block.videoUrl.url ?? null %}
 {% set embedUrl = null %}
+{% set youtubeThumb = null %}
 
 {% if url matches '/(youtube\\.com|youtu\\.be)/' %}
   {% set videoId = url|replace('/^.*(?:youtu\\.be\\/|v=|embed\\/|shorts\\/|live\\/)([A-Za-z0-9_-]{11}).*$/', '$1') %}
   {% if videoId matches '/^[A-Za-z0-9_-]{11}$/' %}
     {% set embedUrl = 'https://www.youtube-nocookie.com/embed/' ~ videoId ~ '?rel=0' %}
+    {# hqdefault (480×360) exists for every video; larger sizes don't #}
+    {% set youtubeThumb = 'https://i.ytimg.com/vi/' ~ videoId ~ '/hqdefault.jpg' %}
   {% endif %}
 {% elseif url matches '/vimeo\\.com/' %}
   {% set videoId = url|replace('/^.*vimeo\\.com\\/(?:video\\/)?(\\d+).*$/', '$1') %}
@@ -21,10 +26,13 @@
 
 {% if embedUrl %}
   {% set poster = block.image.one() %}
+  {% set hasFacade = poster or youtubeThumb %}
+  {# Accessible name for the player: the poster's alt text, or "Video: <page title>" #}
+  {% set videoTitle = (poster.alt ?? null) ?: ('Video'|t ~ ((block.owner.title ?? null) ? ': ' ~ block.owner.title)) %}
   {% set iframe %}
     <iframe
-      src="{{ embedUrl }}{{ poster ? '&autoplay=1' }}"
-      title="{{ 'Video'|t }}"
+      src="{{ embedUrl }}{{ hasFacade ? '&autoplay=1' }}"
+      title="{{ videoTitle }}"
       class="absolute inset-0 h-full w-full"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       allowfullscreen
@@ -34,19 +42,31 @@
 
   <section class="my-16 first:mt-0">
     <div class="relative aspect-video overflow-hidden rounded-2xl bg-zinc-900" data-video>
-      {% if poster %}
-        <button type="button" class="group absolute inset-0 h-full w-full" data-video-play aria-label="{{ 'Play video'|t }}">
-          {{ ui.picture({
-            image: poster,
-            widths: [400, 800, 1200, 1600, 2000],
-            sizes: '(min-width: 1152px) 1088px, 100vw',
-            ratio: '16/9',
-            alt: '',
-            class: 'h-full w-full object-cover',
-            loading: isFirst ? 'eager' : 'lazy'
-          }) }}
+      {% if hasFacade %}
+        <button type="button" class="group absolute inset-0 h-full w-full" data-video-play aria-label="{{ 'Play video'|t }}{{ (poster.alt ?? null) ? ': ' ~ poster.alt }}">
+          {% if poster %}
+            {{ ui.picture({
+              image: poster,
+              widths: [400, 800, 1200, 1600, 2000],
+              sizes: '(min-width: 1152px) 1088px, 100vw',
+              ratio: '16/9',
+              alt: '',
+              class: 'h-full w-full object-cover',
+              loading: isFirst ? 'eager' : 'lazy'
+            }) }}
+          {% else %}
+            <img
+              src="{{ youtubeThumb }}"
+              width="480"
+              height="360"
+              alt=""
+              class="h-full w-full object-cover"
+              loading="{{ isFirst ? 'eager' : 'lazy' }}"
+              decoding="async"
+            >
+          {% endif %}
           <span class="absolute inset-0 flex items-center justify-center bg-zinc-900/20 transition-colors group-hover:bg-zinc-900/30">
-            <span class="flex size-16 items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-lg transition-transform group-hover:scale-105">
+            <span class="flex size-16 items-center justify-center rounded-full bg-white/90 text-zinc-900 shadow-lg transition-transform motion-safe:group-hover:scale-105">
               <svg class="ml-1 size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
             </span>
           </span>

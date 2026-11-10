@@ -3,19 +3,22 @@
 
   Expects:
   - link    (LinkData|null) e.g. block.button
-  - variant (String)        'primary' (default) or 'secondary'
+  - variant (String)        'primary' (default), 'secondary' or 'light' (on dark backgrounds)
 #}
 {% if link and link.url %}
   {% set classes = {
     primary: 'bg-zinc-900 text-white hover:bg-zinc-700',
-    secondary: 'border border-zinc-300 text-zinc-900 hover:border-zinc-900'
+    secondary: 'border border-zinc-300 text-zinc-900 hover:border-zinc-900',
+    light: 'bg-white text-zinc-900 hover:bg-zinc-200'
   } %}
+  {% set newTab = link.target == '_blank' %}
   <a
     href="{{ link.url }}"
     class="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-colors {{ classes[variant ?? 'primary'] ?? classes.primary }}"
     {% if link.target %}target="{{ link.target }}"{% endif %}
-    {% if link.target == '_blank' %}rel="noopener noreferrer"{% endif %}
+    {% if newTab %}rel="noopener noreferrer"{% endif %}
   >
     {{ link.label }}
+    {% if newTab %}<span class="sr-only">{{ '(opens in new tab)'|t }}</span>{% endif %}
   </a>
 {% endif %}

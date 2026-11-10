@@ -1,34 +1,42 @@
+{#
+  Language switcher: links to the same entry on each other site, or to that site's homepage
+  when the entry isn't live there. Shows the language code (NL / EN) and gives screen readers
+  the full language name.
+
+  Expects: entry (Entry|null)
+#}
 {% set sites = craft.app.sites.getAllSites() %}
 
 {% if sites|length > 1 %}
+  {# One query for all sites instead of one per site #}
+  {% set localizedEntries = entry is defined and entry
+    ? craft.entries().id(entry.id).site('*').unique(false).all()
+    : [] %}
+
   <nav aria-label="Language selection" class="inline-flex items-center rounded-full bg-zinc-100 p-0.5 text-xs font-medium">
     {% for site in sites %}
-      {% set targetUrl = null %}
+      {% set localizedEntry = localizedEntries|filter(e => e.siteId == site.id)|first %}
+      {% set targetUrl = (localizedEntry ? localizedEntry.getUrl() : null) ?: site.getBaseUrl() %}
 
-      {% if entry is defined and entry %}
-        {% set localizedEntry = craft.entries()
-          .id(entry.id)
-          .siteId(site.id)
-          .status(null)
-          .one() %}
-
-        {% if localizedEntry and localizedEntry.enabled and localizedEntry.enabledForSite %}
-          {% set targetUrl = localizedEntry.getUrl() %}
-        {% endif %}
-      {% endif %}
-
-      {% set targetUrl = targetUrl ?? site.getBaseUrl() %}
-      {% set label = site.language[: 2]|upper %}
+      {% set langCode = site.language[:2] %}
+      {% set label = langCode|upper %}
+      {% set languageName = craft.app.i18n.getLocaleById(langCode).getDisplayName(langCode)|ucfirst %}
 
       {% if currentSite.handle == site.handle %}
-        <span aria-current="page" class="rounded-full bg-white px-2.5 py-1 text-zinc-900 shadow-sm">{{ label }}</span>
+        <span aria-current="page" class="rounded-full bg-white px-2.5 py-1.5 text-zinc-900 shadow-sm">
+          <span aria-hidden="true">{{ label }}</span>
+          <span class="sr-only" lang="{{ site.language }}">{{ languageName }}</span>
+        </span>
       {% else %}
         <a
           href="{{ targetUrl }}"
           hreflang="{{ site.language }}"
           lang="{{ site.language }}"
-          class="rounded-full px-2.5 py-1 text-zinc-500 transition-colors hover:text-zinc-900"
-        >{{ label }}</a>
+          class="rounded-full px-2.5 py-1.5 text-zinc-600 transition-colors hover:text-zinc-900"
+        >
+          <span aria-hidden="true">{{ label }}</span>
+          <span class="sr-only">{{ languageName }}</span>
+        </a>
       {% endif %}
     {% endfor %}
   </nav>

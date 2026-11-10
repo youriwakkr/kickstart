@@ -7,8 +7,9 @@
       </h2>
     {% endif %}
 
+    {# The page already has its <h1>: rich-text H1s become <h2 data-h1> (styled as H1). Purified HTML, so raw is safe. #}
     <div class="rich-text">
-      {{ block.texteditor }}
+      {{ block.texteditor|replace({ '<h1': '<h2 data-h1', '</h1>': '</h2>' })|raw }}
     </div>
   </section>
 {% endif %}

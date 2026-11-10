@@ -1,0 +1,71 @@
+{#
+  JSON-LD structured data.
+  - Homepage: Organization (from Globals → Site settings) + WebSite
+  - Other entries: BreadcrumbList (Home → ancestors → current page)
+
+  Skipped when SEOmatic is enabled, because it outputs its own JSON-LD.
+
+  Expects: entry (Entry|null)
+#}
+{%- if entry and entry.url and not craft.app.plugins.isPluginEnabled('seomatic') -%}
+  {%- set homeUrl = siteUrl() -%}
+  {%- set isHome = entry.uri == '__home__' -%}
+  {%- set brandName = siteSettings.companyName ?? null ?: craft.app.systemName -%}
+
+  {%- if isHome -%}
+    {%- set address = siteSettings.address.one() ?? null -%}
+    {%- set organization = {
+      '@type': 'Organization',
+      '@id': homeUrl ~ '#organization',
+      name: brandName,
+      url: homeUrl,
+      telephone: siteSettings.phone ?? null,
+      email: siteSettings.email ?? null,
+      address: address ? {
+        '@type': 'PostalAddress',
+        streetAddress: [address.addressLine1, address.addressLine2]|filter(v => v)|join(', ') ?: null,
+        postalCode: address.postalCode,
+        addressLocality: address.locality,
+        addressRegion: address.administrativeArea,
+        addressCountry: address.countryCode
+      }|filter(v => v) : null
+    }|filter(v => v) -%}
+
+    {%- set data = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        organization,
+        {
+          '@type': 'WebSite',
+          '@id': homeUrl ~ '#website',
+          name: brandName,
+          url: homeUrl,
+          inLanguage: currentSite.language,
+          publisher: { '@id': homeUrl ~ '#organization' }
+        }
+      ]
+    } -%}
+  {%- else -%}
+    {%- set crumbs = [{ name: 'Home'|t, url: homeUrl }] -%}
+    {%- if entry.structureId -%}
+      {%- for ancestor in entry.getAncestors().all()|filter(a => a.url) -%}
+        {%- set crumbs = crumbs|merge([{ name: ancestor.title, url: ancestor.url }]) -%}
+      {%- endfor -%}
+    {%- endif -%}
+    {%- set crumbs = crumbs|merge([{ name: entry.title, url: entry.url }]) -%}
+
+    {%- set data = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: crumbs|map((crumb, i) => {
+        '@type': 'ListItem',
+        position: i + 1,
+        name: crumb.name,
+        item: crumb.url
+      })
+    } -%}
+  {%- endif %}
+
+  {# JSON_HEX_TAG escapes < and > so content can never close the <script> tag; raw is safe here #}
+  <script type="application/ld+json">{{ data|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}</script>
+{%- endif -%}

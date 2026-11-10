@@ -21,6 +21,8 @@ export default defineConfig(({ command, mode }) => {
         input: {
           // The entry point for Vite, we'll create this file soon
           app: "src/js/app.js",
+          // Separate entry: only loaded when GTM_ID is set (see _layouts/_layout.twig)
+          gtm: "src/js/gtm.js",
         },
       },
     },

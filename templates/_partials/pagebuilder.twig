@@ -3,12 +3,22 @@
   _components/<entry type handle>.twig (e.g. _components/pbHero.twig).
 
   Expects: entry (Entry|null)
-  Passes to each block: block (Entry), isFirst (bool) so the first block can load its image eagerly (LCP).
+  Passes to each block: block (Entry), isFirst (bool) so the first block can load its image eagerly (LCP)
+  and pbHero knows whether it renders the page's <h1>.
+
+  Every page gets exactly one <h1>: the first block's pbHero heading, or otherwise a visually
+  hidden <h1> with the entry title (the site name on the homepage).
 #}
-{% if entry and entry.pagebuilder is defined %}
-  {% set blocks = entry.pagebuilder
-    .with(['image', 'images', 'faqItems'])
-    .all() %}
+{% if entry %}
+  {% set blocks = entry.pagebuilder is defined
+    ? entry.pagebuilder.with(['image', 'images', 'faqItems']).all()
+    : [] %}
+
+  {% set firstBlock = blocks|first %}
+  {% if not firstBlock or firstBlock.type.handle != 'pbHero' %}
+    {% set isHome = entry.uri == '__home__' %}
+    <h1 class="sr-only">{{ isHome ? (siteSettings.companyName ?? null ?: craft.app.systemName) : entry.title }}</h1>
+  {% endif %}
 
   {% for block in blocks %}
     {% include '_components/' ~ block.type.handle ~ '.twig' ignore missing with {

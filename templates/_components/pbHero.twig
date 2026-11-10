@@ -1,13 +1,17 @@
-{# Hero: heading, subheading, image, button #}
+{#
+  Hero: heading, subheading, image, button.
+  As the first block it renders the page's <h1>; further down the page it renders an <h2> (same styling).
+#}
 {% import '_macros/picture.twig' as ui %}
 
 {% set image = block.image.one() %}
+{% set headingTag = (isFirst ?? true) ? 'h1' : 'h2' %}
 
 <section class="my-12 first:mt-0 grid items-center gap-10 {{ image ? 'lg:grid-cols-2' }}">
   <div class="space-y-6 {{ not image ? 'max-w-3xl' }}">
-    <h1 class="text-4xl font-light tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl text-balance">
+    <{{ headingTag }} class="text-4xl font-light tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl text-balance">
       {{ block.heading }}
-    </h1>
+    </{{ headingTag }}>
 
     {% if block.subheading %}
       <p class="text-lg font-light leading-relaxed text-zinc-600 sm:text-xl text-pretty">

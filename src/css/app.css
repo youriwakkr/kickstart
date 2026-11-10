@@ -4,6 +4,30 @@
 /* Point Tailwind to your Craft CMS Twig templates */
 @source "../../templates/**/*.{twig,html}";
 
+@layer base {
+  /*
+    Focus outline for keyboard users on every interactive element.
+    On dark backgrounds, set --focus-color on a wrapper, e.g. class="[--focus-color:var(--color-white)]".
+    Elements that only receive focus from scripts (tabindex="-1", like <main> after the skip link) are left out.
+  */
+  :where(a, button, summary, input, select, textarea, iframe, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 2px solid var(--focus-color, var(--color-zinc-900));
+    outline-offset: 3px;
+  }
+
+  /* Respect "reduce motion": no smooth scrolling, transitions or animations */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
 /*
   rich-text: styles the HTML from CKEditor fields (texteditor, simpleTexteditor).
   Usage: <div class="rich-text">{{ block.texteditor }}</div>
@@ -30,7 +54,8 @@
     margin-top: 2em;
   }
 
-  & h1 {
+  /* [data-h1]: H1s from the editor, output as <h2> by the templates (one <h1> per page) */
+  & :is(h1, [data-h1]) {
     font-size: var(--text-3xl);
     line-height: 1.2;
   }

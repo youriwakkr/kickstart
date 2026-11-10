@@ -68,14 +68,14 @@ A starter project for new Craft CMS 5 websites. Copy it, rename a few things, an
 
   | Block | Fields |
   | --- | --- |
-  | `pbHero` | heading*, subheading, image, button. Renders the page's `<h1>`, so use it as the first block |
+  | `pbHero` | heading*, subheading, image, button. As the first block it renders the page's `<h1>`; further down it renders an `<h2>` |
   | `pbText` | heading, texteditor* |
   | `pbTextImage` | heading, texteditor, image*, imageLeft, button |
   | `pbImage` | image*, caption |
   | `pbGallery` | heading, images* |
   | `pbQuote` | quote*, quoteAuthor |
   | `pbCta` | heading*, simpleTexteditor, button |
-  | `pbVideo` | videoUrl*, image (poster). With a poster, the player only loads after a click |
+  | `pbVideo` | videoUrl*, image (poster). With a poster, the player only loads after a click. YouTube videos without a poster use YouTube's thumbnail, so they load on click too. Vimeo videos without a poster embed directly |
   | `pbFaq` | heading, faqItems* |
 
   \* required
@@ -83,7 +83,7 @@ A starter project for new Craft CMS 5 websites. Copy it, rename a few things, an
   - `Navigation`: `mainNavigation` (header and mobile menu) and `footerNavigation` (footer). Both are entries fields that pick from Pages, in the order you set.
   - `Site settings`: `companyName` (logo text and copyright; falls back to "Kickstart"), `phone`, `email`, `address` (native Addresses field, max 1, output with `|address`) and `footerText` (translatable).
 - **Rich text field** `texteditor` (CKEditor):
-  - Toolbar: headings H1 to H6, bold, italic, links, bulleted and numbered lists, blockquote, horizontal line, remove formatting, and source editing (admins only). Note that `pbHero` already renders the page's `<h1>`.
+  - Toolbar: headings H1 to H6, bold, italic, links, bulleted and numbered lists, blockquote, horizontal line, remove formatting, and source editing (admins only). The page's `<h1>` comes from the template (see **Headings** below), so an H1 in the editor is output as `<h2 data-h1>`, styled like an H1.
   - `config/ckeditor/editor.css` (the field's "CSS file") styles H1 to H6 inside the editor in the control panel. Without it, headings fall back to the CP's own UI styles, where H3 is body size and H6 isn't styled. It uses the same heading scale as the `rich-text` utility, so keep the two in sync.
   - `config/ckeditor/default.json` holds the CKEditor options: an "Open in a new tab" checkbox on links (adds `target="_blank" rel="noopener noreferrer"`), `https://` as the default link protocol, and a start number for numbered lists. To give another field its own setup, add a JSON file next to it and choose it in that field's settings.
   - `config/htmlpurifier/Default.json` cleans the saved HTML. It allows `rel="noopener noreferrer nofollow"`, strips inline `style` attributes, and only allows YouTube and Vimeo iframes.
@@ -94,13 +94,16 @@ A starter project for new Craft CMS 5 websites. Copy it, rename a few things, an
 
 ```
 templates/
-├── _layouts/_layout.twig            # Base HTML: <head> (GTM, SEO partial, SEOMate hook, Vite), header, <main>, footer
+├── 404.twig                         # "Page not found" page (uses the layout, noindex)
+├── 503.twig                         # Maintenance / system offline page (standalone: no layout, DB queries or Vite)
+├── _layouts/_layout.twig            # Base HTML: <head> (GTM, SEO partials, SEOMate hook, Vite), skip link, header, <main>, footer
 ├── _partials/header.twig            # Site header, main nav (Globals → Navigation), language switcher, mobile nav toggle
-├── _partials/footer.twig            # Site footer: company name, footer text, contact details, footer nav
-├── _partials/seo-head.twig          # Fallback <title>, canonical, hreflang, Open Graph (skipped when SEOmatic/SEOMate is enabled)
-├── _partials/language-switcher.twig # NL / EN switcher that links to the same entry on the other site
+├── _partials/footer.twig            # Site footer: company name, footer text, contact details, footer nav (template-cached per site)
+├── _partials/seo-head.twig          # Fallback <title>, description, canonical, hreflang, Open Graph/Twitter (skipped when SEOmatic/SEOMate is enabled)
+├── _partials/schema.twig            # JSON-LD: Organization + WebSite on the homepage, BreadcrumbList on pages (skipped when SEOmatic is enabled)
+├── _partials/language-switcher.twig # NL / EN switcher that links to the same entry on the other site (full language name for screen readers)
 ├── _partials/pagebuilder.twig       # Renders an entry's pagebuilder blocks (with eager loading)
-├── _partials/button.twig            # Button from a Link field (primary / secondary)
+├── _partials/button.twig            # Button from a Link field (primary / secondary / light), announces "opens in new tab"
 ├── _components/                     # One template per pagebuilder block (pbHero, pbText, pbTextImage, …)
 ├── _pages/_entry.twig               # Page template
 ├── _macros/picture.twig             # Responsive, multi-format <picture> macro
@@ -119,11 +122,37 @@ Folders starting with `_` can't be opened directly as URLs.
 {% include '_partials/pagebuilder.twig' with { entry: entry ?? null } only %}
 ```
 
-It eager-loads `image`, `images` and `faqItems`, and includes `_components/<block type handle>.twig` for each block with `block` and `isFirst`. The first block uses `isFirst` to load its image eagerly, since it's usually the LCP image. To add a block: create a nested entry type, add it to the `pagebuilder` field, and add a template with the same handle in `_components/`.
+It eager-loads `image`, `images` and `faqItems`, and includes `_components/<block type handle>.twig` for each block with `block` and `isFirst`. The first block uses `isFirst` to load its image eagerly, since it's usually the LCP image. 
 
-**Open Graph:** `seo-head.twig` outputs `og:title`, `og:url` and, when the page has a `pbHero` with an image, a 1200×630 `og:image`.
+**Headings:** every page gets exactly one `<h1>`. When the first block is a `pbHero`, its heading is the `<h1>`. Otherwise `pagebuilder.twig` outputs a visually hidden `<h1>` with the entry title (the site name on the homepage). A `pbHero` further down the page renders an `<h2>`. In `pbText` and `pbTextImage`, H1s from the editor are output as `<h2 data-h1>`, styled like an H1 by the `rich-text` utility. Block headings are `<h2>`.
 
-**Page title:** while no SEO plugin is installed, `seo-head.twig` outputs "Entry title | System name". The homepage and pages without an entry show just the system name, which you set under **Settings → General → System Name**.
+To add a block: create a nested entry type, add it to the `pagebuilder` field, and add a template with the same handle in `_components/`.
+
+**Meta description and Open Graph:** the description (`<meta name="description">` and `og:description`) and the 1200×630 `og:image` come from the page's first `pbHero` block (its subheading and image). Without a hero subheading, the description falls back to the plain text of the first `pbText` or `pbTextImage` block, cut at a word boundary to at most 160 characters. Pages without either get no description, and pages without a hero image get no share image. `seo-head.twig` also outputs `og:site_name` (Site settings → company name, or the system name), `og:locale` with `og:locale:alternate` for the other sites, and `twitter:card`.
+
+**Page title:** while no SEO plugin is installed, `seo-head.twig` outputs "Entry title | System name". The homepage shows just the system name, which you set under **Settings → General → System Name**. Templates without an entry can set `{% set pageTitle = '…' %}` (see `404.twig`).
+
+**Structured data:** `schema.twig` outputs JSON-LD. On the homepage it outputs `Organization` (company name, phone, email and address from Site settings; empty fields are left out) and `WebSite`. On other pages it outputs a `BreadcrumbList` (Home → parent pages → current page). SEOMate doesn't output JSON-LD, so this stays on with SEOMate. It's skipped with SEOmatic, which has its own.
+
+**noindex:** a template can set `{% set noindex = true %}` to add `<meta name="robots" content="noindex">` and skip canonical, hreflang, `og:url` and JSON-LD.
+
+**Error pages:**
+- `404.twig` uses the normal layout and is set to noindex.
+- `503.twig` is shown when the system is offline (**Settings → General → System Status**) or while Craft is updating. It's deliberately standalone: no layout, globals or queries, because the database may be unavailable, and inline CSS because the Vite assets might not be reachable.
+- With dev mode on, Craft shows its debug error page instead. To check the designs, open `/404` and `/503` directly (they return status 200 there), or set `CRAFT_DEV_MODE=false`.
+
+### Accessibility
+
+- **Skip link:** a "Skip to content" link appears on the first Tab press and jumps to `<main id="main">`.
+- **Focus outline:** `src/css/app.css` gives every link, button and form field a `:focus-visible` outline. On dark backgrounds, set `[--focus-color:var(--color-white)]` on a wrapper (see `pbCta.twig`).
+- **Sticky header:** `<html>` has `scroll-pt-20`, so anchor targets and focused elements aren't hidden under the header.
+- **Reduced motion:** when the visitor has turned on "reduce motion", smooth scrolling, transitions and animations are off, and the hover transforms use `motion-safe:`.
+- **Mobile menu:** Escape closes it and moves focus back to the toggle. It also closes when the window grows to desktop width.
+- **Video:** after the play button is clicked, focus moves to the player. The player's title is the poster's alt text, or "Video: page title".
+- **New tabs:** `button.twig` adds visually hidden "(opens in new tab)" text to links with `target="_blank"`.
+- **Contrast:** keep small text at `zinc-500` or darker on white and `zinc-50`, and at `zinc-600` on `zinc-100` (WCAG AA 4.5:1).
+- **Tap targets:** the language switcher and footer links are at least 24px tall (WCAG 2.5.8 / Lighthouse `target-size`).
+- **Your job in the CMS:** don't skip heading levels in the rich text (start at H2 or H3 under a block heading), and fill in alt text on images.
 
 ### Translations
 
@@ -136,14 +165,21 @@ Use them in Twig with the `t` filter: `{{ 'Read more'|t }}`. Add each new key to
 
 ### Front-end
 
-- `src/js/app.js` is the Vite entry point. It imports `src/css/app.css` and `src/js/web-vitals.js`, and holds the click-to-play handler for `pbVideo`.
+- **One JS file per task.** `src/js/app.js` is the Vite entry point and only contains imports, with no code of its own:
+  - `src/css/app.css`
+  - `src/js/web-vitals.js`: Core Web Vitals measurement
+  - `src/js/mobile-nav.js`: mobile menu toggle, Escape to close, close on desktop width
+  - `src/js/video-player.js`: click-to-play for `pbVideo`
+
+  For new behaviour, add a new file and import it in `app.js`. Templates have no inline JavaScript. The only `<script>` with content is the JSON-LD, which is data, not code. This keeps a strict Content Security Policy possible.
+- `src/js/gtm.js` is a separate Vite entry (see `vite.config.js`), loaded only when GTM is on.
 - `src/css/app.css` imports Tailwind 4 and scans `templates/**/*.{twig,html}` for classes. Tailwind is configured in this CSS file (`@theme`, `@source`), so there's no `tailwind.config.js`.
 - The production build goes to `web/dist/`, which git ignores.
 - `src/js/web-vitals.js` measures Core Web Vitals (LCP, INP, CLS, plus FCP and TTFB). On the Vite dev server it logs them to the browser console. In the production build it pushes them to the GTM `dataLayer` as a `web_vitals` event, but only when GTM is loaded. Otherwise nothing is sent.
 
 ### Google Tag Manager
 
-GTM is built into `_layouts/_layout.twig`, but it only loads when `GTM_ID` is set in `.env` (for example `GTM_ID=GTM-XXXXXXX`). Leave it empty to turn GTM off. Usually only production sets it. The value reaches Twig through `config/custom.php`.
+GTM is loaded by `src/js/gtm.js`, which `_layouts/_layout.twig` includes with `async` and a `data-gtm-id` attribute. It only loads when `GTM_ID` is set in `.env` (for example `GTM_ID=GTM-XXXXXXX`). Leave it empty to turn GTM off. Usually only production sets it. The value reaches Twig through `config/custom.php`.
 
 To send Web Vitals to GA4: in GTM, create a **Custom Event** trigger on `web_vitals`, plus a GA4 event tag that sends `metric_name`, `metric_value` and `metric_rating` as event parameters.
 

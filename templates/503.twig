@@ -1,0 +1,87 @@
+{#
+  503 page: shown when the system is offline (Settings → General → System Status) or while Craft is updating.
+
+  Deliberately standalone:
+  - No layout, partials, globals or entry queries: the database may be unavailable or mid-migration.
+  - Inline CSS instead of Vite/Tailwind: the dev server or built assets might not be reachable.
+#}
+{%- set lang = craft.app.language ?? 'en' -%}
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="robots" content="noindex"/>
+    <title>{{ 'Back soon'|t }} | {{ craft.app.systemName }}</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --text: #18181b;
+        --muted: #52525b;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #18181b;
+          --text: #fafafa;
+          --muted: #a1a1aa;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      body {
+        align-items: center;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 1.5rem;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        max-width: 36rem;
+      }
+
+      main > * + * {
+        margin-top: 1.25rem;
+      }
+
+      .label {
+        color: var(--muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        font-size: clamp(2.25rem, 6vw, 3rem);
+        font-weight: 300;
+        letter-spacing: -0.025em;
+        line-height: 1.1;
+      }
+
+      p {
+        color: var(--muted);
+        font-size: 1.125rem;
+        font-weight: 300;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="label">{{ craft.app.systemName }}</p>
+      <h1>{{ 'Back soon'|t }}</h1>
+      <p>{{ 'We’re doing some maintenance on the website. Please try again in a few minutes.'|t }}</p>
+    </main>
+  </body>
+</html>

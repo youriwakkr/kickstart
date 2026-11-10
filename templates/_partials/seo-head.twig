@@ -1,50 +1,97 @@
 {#
-  Basic SEO head tags: canonical + hreflang alternates.
+  Basic SEO head tags: title, description, canonical, hreflang and Open Graph / Twitter.
 
   Skipped automatically when SEOmatic or SEOMate is enabled: both plugins output
   these tags themselves, and duplicate canonical/hreflang tags confuse search engines.
 
-  Expects: entry (Entry|null)
+  Expects:
+  - entry     (Entry|null)
+  - pageTitle (String|null) Title for pages without an entry (e.g. the 404 page)
+  - noindex   (Bool)        Skips canonical, hreflang and og:url (e.g. error pages)
 #}
 {%- set plugins = craft.app.plugins -%}
 {%- if not plugins.isPluginEnabled('seomatic') and not plugins.isPluginEnabled('seomate') -%}
   {%- set pageNum = craft.app.request.pageNum -%}
+  {%- set noindex = noindex ?? false -%}
 
   {# Title: "Entry title | System name" (Settings → General → System Name).
-     The homepage and pages without an entry show just the system name. #}
+     The homepage shows just the system name; pages without an entry use pageTitle when given. #}
   {%- set systemName = craft.app.systemName -%}
   {%- set isHome = entry and entry.uri == '__home__' -%}
-  <title>{{ (entry and not isHome) ? entry.title ~ ' | ' ~ systemName : systemName }}</title>
+  {%- set titleText = (entry and not isHome) ? entry.title : (not entry ? (pageTitle ?? null) : null) -%}
+  {%- set siteName = siteSettings.companyName ?? null ?: systemName -%}
+  <title>{{ titleText ? titleText ~ ' | ' ~ systemName : systemName }}</title>
+
+  {# Description and share image: from the first pbHero block (subheading and image).
+     Without a hero subheading, the description falls back to the first text block's plain text (max ~160 characters). #}
+  {%- set seoBlocks = entry and entry.pagebuilder is defined
+    ? entry.pagebuilder.type(['pbHero', 'pbText', 'pbTextImage']).all()
+    : [] -%}
+  {%- set hero = seoBlocks|filter(b => b.type.handle == 'pbHero')|first ?: null -%}
+  {%- set description = hero.subheading ?? null -%}
+  {%- if not description -%}
+    {%- set textBlock = seoBlocks|filter(b => b.type.handle != 'pbHero' and b.texteditor)|first -%}
+    {%- if textBlock -%}
+      {# Block tags become spaces so "<p>One</p><p>Two</p>" reads "One Two"; decode the entities CKEditor stores #}
+      {%- set description = (textBlock.texteditor ~ '')
+        |replace('/<\\/(p|h[1-6]|li|blockquote)>|<br\\s*\\/?>/i', ' ')
+        |striptags
+        |replace({ '&nbsp;': ' ', '&amp;': '&', '&quot;': '"', '&#39;': "'", '&lt;': '<', '&gt;': '>' })
+        |replace('/\\s+/', ' ')
+        |trim -%}
+      {%- if description|length > 160 -%}
+        {%- set description = (description|slice(0, 157)|split(' ')|slice(0, -1)|join(' '))|trim(',.;: ') ~ '…' -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- set ogImage = hero ? hero.image.one() : null -%}
+  {%- set ogImage = ogImage and ogImage.kind == 'image' ? ogImage : null -%}
+
+  {%- if description %}
+    <meta name="description" content="{{ description }}"/>
+  {%- endif %}
 
   {# Canonical: the entry's own URL, or the current URL (without query string) for other pages and paginated pages #}
   {%- set canonicalUrl = (entry and entry.url and pageNum == 1)
     ? entry.url
     : craft.app.request.absoluteUrl|split('?')|first -%}
-  <link rel="canonical" href="{{ canonicalUrl }}"/>
+  {%- if not noindex %}
+    <link rel="canonical" href="{{ canonicalUrl }}"/>
+  {%- endif %}
 
-  {# Open Graph: title, URL and the image of the first pbHero block (when it has one) #}
-  {%- set ogImage = entry and entry.pagebuilder is defined
-    ? (entry.pagebuilder.type('pbHero').one().image.one() ?? null)
-    : null -%}
+  {# The entry on every site where it's live (for hreflang and og:locale:alternate) #}
+  {%- set sites = craft.app.sites.getAllSites() -%}
+  {%- set localizedEntries = entry and sites|length > 1
+    ? craft.entries().id(entry.id).site('*').unique(false).all()|filter(e => e.url)
+    : [] -%}
+
+  {# Open Graph / Twitter #}
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="{{ (entry and not isHome) ? entry.title : systemName }}"/>
-  <meta property="og:url" content="{{ canonicalUrl }}"/>
-  {%- if ogImage and ogImage.kind == 'image' %}
+  <meta property="og:site_name" content="{{ siteName }}"/>
+  <meta property="og:title" content="{{ titleText ?? siteName }}"/>
+  {%- if description %}
+    <meta property="og:description" content="{{ description }}"/>
+  {%- endif %}
+  {%- if not noindex %}
+    <meta property="og:url" content="{{ canonicalUrl }}"/>
+  {%- endif %}
+  <meta property="og:locale" content="{{ currentSite.language|replace('-', '_') }}"/>
+  {%- for localized in localizedEntries|filter(e => e.siteId != currentSite.id) %}
+    <meta property="og:locale:alternate" content="{{ localized.site.language|replace('-', '_') }}"/>
+  {%- endfor %}
+  {%- if ogImage %}
     <meta property="og:image" content="{{ ogImage.getUrl({ mode: 'crop', width: 1200, height: 630, format: 'jpg' }, true) }}"/>
     <meta property="og:image:width" content="1200"/>
     <meta property="og:image:height" content="630"/>
+    {%- if ogImage.alt %}
+      <meta property="og:image:alt" content="{{ ogImage.alt }}"/>
+    {%- endif %}
   {%- endif %}
+  <meta name="twitter:card" content="{{ ogImage ? 'summary_large_image' : 'summary' }}"/>
 
   {# hreflang: one link per site where this entry is live, plus x-default (primary site). Skipped on paginated pages. #}
-  {%- set sites = craft.app.sites.getAllSites() -%}
-  {%- if entry and pageNum == 1 and sites|length > 1 -%}
-    {%- set localizedEntries = craft.entries()
-      .id(entry.id)
-      .site('*')
-      .unique(false)
-      .all() -%}
-
-    {%- for localized in localizedEntries|filter(e => e.url) %}
+  {%- if not noindex and pageNum == 1 -%}
+    {%- for localized in localizedEntries %}
       <link rel="alternate" hreflang="{{ localized.site.language }}" href="{{ localized.url }}"/>
       {%- if localized.site.primary %}
         <link rel="alternate" hreflang="x-default" href="{{ localized.url }}"/>
