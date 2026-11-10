@@ -384,6 +384,15 @@ git add .
 git commit -m "Initial commit from Craft CMS kickstart"
 ```
 
+### 8. Fill in the project briefs
+
+The project requirements are written down in two briefs in `docs/`, which are built in this order:
+
+1. [`docs/brief-1-content.md`](docs/brief-1-content.md): general settings, sites, fields, sections and entry types, categories, tags, globals, routes, listings and new pagebuilder blocks.
+2. [`docs/brief-2-style.md`](docs/brief-2-style.md): brand, design tokens, global parts and the look of each block and page.
+
+Put screenshots, logos and other reference files in `docs/brief-assets/`. Each brief starts with build instructions for Claude Code. Give it a finished brief to build from, for example "Build docs/brief-1-content.md".
+
 ---
 
 ## Everyday commands
