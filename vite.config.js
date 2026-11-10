@@ -39,7 +39,7 @@ export default defineConfig(({ command, mode }) => {
       // Setting a specific origin ensures that your fonts & images load
       // correctly. Assumes you're accessing the front-end over https
       origin: env.PRIMARY_SITE_URL + ":" + HTTPS_PORT,
-      allowedHosts: ["craftcmstest.ddev.site", "localhost"],
+      allowedHosts: ["kickstart.ddev.site", "localhost"],
     },
   };
 });
