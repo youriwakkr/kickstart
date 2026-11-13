@@ -1,9 +1,4 @@
-{#
-  Content from Globals → Navigation (footerNavigation) and Globals → Site settings.
-  Cached per site: Craft clears the cache when a page, the navigation or the site settings are saved.
-  'for 1 day' keeps the copyright year current.
-#}
-{% cache globally using key 'footer' for 1 day %}
+{# Content from Globals → Navigation (footerNavigation) and Globals → Site settings. #}
 {% set footerPages = navigation.footerNavigation.all() ?? [] %}
 {% set brandName = siteSettings.companyName ?? null ?: 'Kickstart' %}
 {% set footerText = siteSettings.footerText ?? null %}
@@ -60,4 +55,3 @@
     </div>
   </div>
 </footer>
-{% endcache %}

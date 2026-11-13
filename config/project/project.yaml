@@ -1,7 +1,11 @@
-dateModified: 1794242037
+dateModified: 1794561189
 email:
   fromEmail: admin@wakkr.com
-  fromName: craftcmstest
+  fromName: Kickstart
+  replyToEmail: null
+  template: null
+  transportSettings:
+    command: '/usr/local/bin/mailpit sendmail -t --smtp-addr 127.0.0.1:1025'
   transportType: craft\mail\transportadapters\Sendmail
 fs:
   localUploads:
@@ -31,7 +35,7 @@ meta:
     298c73d1-5e6d-4a5e-b2c9-b0a44f365c27: Pages # Pages
     953a3a1d-472b-4b25-aad1-bd2b65016b1b: Email # Email
     01311a54-6117-4ea4-b39f-94717445897a: 'Site settings' # Site settings
-    1315f0d3-39d5-4db8-82fe-75feb6a29ee3: craftcmstest # craftcmstest
+    1315f0d3-39d5-4db8-82fe-75feb6a29ee3: kickstart # kickstart
     1959625a-33c3-4d26-b1ca-806e9b7f84b5: Quote # Quote
     24824044-5dbd-449b-856c-ed6aa9debef5: FAQ # FAQ
     79046063-38be-4e9e-bfc8-a8941168435f: 'Text & image' # Text & image
@@ -64,7 +68,7 @@ plugins:
 system:
   edition: solo
   live: true
-  name: 'Craft Test CMS'
+  name: Kickstart
   retryDuration: null
   schemaVersion: 5.11.0.2
   timeZone: Europe/Amsterdam

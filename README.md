@@ -8,18 +8,18 @@ A starter project for new Craft CMS 5 websites. Copy it, rename a few things, an
 
 ### Stack
 
-| Part | Version / package |
-| --- | --- |
-| Craft CMS | `craftcms/cms` ^5.9 |
-| PHP | 8.4 (via DDEV) |
-| Database | MySQL 8.0 (via DDEV) |
-| Web server | nginx-fpm (via DDEV) |
-| Node | 24 (via DDEV) |
-| Asset bundler | Vite 8 + `nystudio107/craft-vite` |
-| CSS | Tailwind CSS 4 (`@tailwindcss/vite`) |
-| Rich text | CKEditor 5 (`craftcms/ckeditor`) |
-| Performance | `web-vitals` 6 (Core Web Vitals measurement) |
-| Dev tools | `craftcms/generator`, `yiisoft/yii2-shell`, Prettier |
+| Part          | Version / package                                    |
+| ------------- | ---------------------------------------------------- |
+| Craft CMS     | `craftcms/cms` ^5.9                                  |
+| PHP           | 8.4 (via DDEV)                                       |
+| Database      | MySQL 8.0 (via DDEV)                                 |
+| Web server    | nginx-fpm (via DDEV)                                 |
+| Node          | 24 (set in `.nvmrc`, used by DDEV and CI)            |
+| Asset bundler | Vite 8 + `nystudio107/craft-vite`                    |
+| CSS           | Tailwind CSS 4 (`@tailwindcss/vite`)                 |
+| Rich text     | CKEditor 5 (`craftcms/ckeditor`)                     |
+| Performance   | `web-vitals` 6 (Core Web Vitals measurement)         |
+| Dev tools     | `craftcms/generator`, `yiisoft/yii2-shell`, Prettier |
 
 ### Local environment (DDEV)
 
@@ -33,6 +33,8 @@ A starter project for new Craft CMS 5 websites. Copy it, rename a few things, an
   - Monday as the week start, no `index.php` in URLs, preloaded singles, user-enumeration protection, no front-end login page, and the Twig sandbox turned on.
   - Dev mode and admin changes are controlled from `.env`.
   - `disallowRobots` defaults to `true`: crawlers are blocked unless `CRAFT_DISALLOW_ROBOTS=false` is set (production only).
+  - No `X-Powered-By: Craft CMS` header, and the GraphQL API is off (set `enableGql` to `true` in projects that need it).
+  - At most 25 revisions per entry, uploaded filenames converted to ASCII, no upscaling in image transforms, and a version query string (`?v=…`) on asset URLs so replaced files bypass caches.
 - **`config/custom.php`**: project settings read from `.env`, available in Twig as `craft.app.config.custom.<key>`. It currently holds `gtmId` (from `GTM_ID`).
 - **`config/vite.php`**: uses the dev server when `CRAFT_ENVIRONMENT=dev`, and the built manifest in `web/dist/` otherwise.
 - **`config/app.php`**: the app ID comes from `CRAFT_APP_ID`.
@@ -50,35 +52,36 @@ A starter project for new Craft CMS 5 websites. Copy it, rename a few things, an
 - **Volume**: `Images volume`, served from `$PRIMARY_SITE_UPLOADS_URL` (`web/uploads/`, which git ignores).
 - **Shared fields**: reused across blocks. Craft 5 lets you add a field to a layout more than once under a different handle and label (for example `subheading` appears as `caption` and `quoteAuthor`).
 
-  | Handle | Type | Notes |
-  | --- | --- | --- |
-  | `heading` | Plain Text | Translatable |
-  | `subheading` | Plain Text | Translatable |
-  | `texteditor` | CKEditor | Full toolbar (see below) |
-  | `simpleTexteditor` | CKEditor | Bold, italic, link, lists. For short texts such as CTAs and FAQ answers |
-  | `image` | Assets | Max 1, images only |
-  | `images` | Assets | Multiple, images only |
-  | `button` | Link | Entry, URL, email, phone or asset, with label and "open in new tab". (`link` is a reserved handle in Craft) |
-  | `quote` | Plain Text (multi-line) | pbQuote |
-  | `imageLeft` | Lightswitch | pbTextImage |
-  | `videoUrl` | Link (URL only) | pbVideo, YouTube or Vimeo |
-  | `faqItems` | Matrix | pbFaq, nested `faqItem` entries (title = question, `answer` = simpleTexteditor) |
+  | Handle             | Type                    | Notes                                                                                                       |
+  | ------------------ | ----------------------- | ----------------------------------------------------------------------------------------------------------- |
+  | `heading`          | Plain Text              | Translatable                                                                                                |
+  | `subheading`       | Plain Text              | Translatable                                                                                                |
+  | `texteditor`       | CKEditor                | Full toolbar (see below)                                                                                    |
+  | `simpleTexteditor` | CKEditor                | Bold, italic, link, lists. For short texts such as CTAs and FAQ answers                                     |
+  | `image`            | Assets                  | Max 1, images only                                                                                          |
+  | `images`           | Assets                  | Multiple, images only                                                                                       |
+  | `button`           | Link                    | Entry, URL, email, phone or asset, with label and "open in new tab". (`link` is a reserved handle in Craft) |
+  | `quote`            | Plain Text (multi-line) | pbQuote                                                                                                     |
+  | `imageLeft`        | Lightswitch             | pbTextImage                                                                                                 |
+  | `videoUrl`         | Link (URL only)         | pbVideo, YouTube or Vimeo                                                                                   |
+  | `faqItems`         | Matrix                  | pbFaq, nested `faqItem` entries (title = question, `answer` = simpleTexteditor)                             |
 
 - **Pagebuilder** (`pagebuilder`, Matrix): each block is a nested entry type with a template in `_components/<handle>.twig`:
 
-  | Block | Fields |
-  | --- | --- |
-  | `pbHero` | heading*, subheading, image, button. As the first block it renders the page's `<h1>`; further down it renders an `<h2>` |
-  | `pbText` | heading, texteditor* |
-  | `pbTextImage` | heading, texteditor, image*, imageLeft, button |
-  | `pbImage` | image*, caption |
-  | `pbGallery` | heading, images* |
-  | `pbQuote` | quote*, quoteAuthor |
-  | `pbCta` | heading*, simpleTexteditor, button |
-  | `pbVideo` | videoUrl*, image (poster). With a poster, the player only loads after a click. YouTube videos without a poster use YouTube's thumbnail, so they load on click too. Vimeo videos without a poster embed directly |
-  | `pbFaq` | heading, faqItems* |
+  | Block         | Fields                                                                                                                                                                                                           |
+  | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | `pbHero`      | heading\*, subheading, image, button. As the first block it renders the page's `<h1>`; further down it renders an `<h2>`                                                                                         |
+  | `pbText`      | heading, texteditor\*                                                                                                                                                                                            |
+  | `pbTextImage` | heading, texteditor, image\*, imageLeft, button                                                                                                                                                                  |
+  | `pbImage`     | image\*, caption                                                                                                                                                                                                 |
+  | `pbGallery`   | heading, images\*                                                                                                                                                                                                |
+  | `pbQuote`     | quote\*, quoteAuthor                                                                                                                                                                                             |
+  | `pbCta`       | heading\*, simpleTexteditor, button                                                                                                                                                                              |
+  | `pbVideo`     | videoUrl\*, image (poster). With a poster, the player only loads after a click. YouTube videos without a poster use YouTube's thumbnail, so they load on click too. Vimeo videos without a poster embed directly |
+  | `pbFaq`       | heading, faqItems\*                                                                                                                                                                                              |
 
   \* required
+
 - **Globals**:
   - `Navigation`: `mainNavigation` (header and mobile menu) and `footerNavigation` (footer). Both are entries fields that pick from Pages, in the order you set.
   - `Site settings`: `companyName` (logo text and copyright; falls back to "Kickstart"), `phone`, `email`, `address` (native Addresses field, max 1, output with `|address`) and `footerText` (translatable).
@@ -98,7 +101,7 @@ templates/
 ├── 503.twig                         # Maintenance / system offline page (standalone: no layout, DB queries or Vite)
 ├── _layouts/_layout.twig            # Base HTML: <head> (GTM, SEO partials, SEOMate hook, Vite), skip link, header, <main>, footer
 ├── _partials/header.twig            # Site header, main nav (Globals → Navigation), language switcher, mobile nav toggle
-├── _partials/footer.twig            # Site footer: company name, footer text, contact details, footer nav (template-cached per site)
+├── _partials/footer.twig            # Site footer: company name, footer text, contact details, footer nav
 ├── _partials/seo-head.twig          # Fallback <title>, description, canonical, hreflang, Open Graph/Twitter (skipped when SEOmatic/SEOMate is enabled)
 ├── _partials/schema.twig            # JSON-LD: Organization + WebSite on the homepage, BreadcrumbList on pages (skipped when SEOmatic is enabled)
 ├── _partials/language-switcher.twig # NL / EN switcher that links to the same entry on the other site (full language name for screen readers)
@@ -122,7 +125,7 @@ Folders starting with `_` can't be opened directly as URLs.
 {% include '_partials/pagebuilder.twig' with { entry: entry ?? null } only %}
 ```
 
-It eager-loads `image`, `images` and `faqItems`, and includes `_components/<block type handle>.twig` for each block with `block` and `isFirst`. The first block uses `isFirst` to load its image eagerly, since it's usually the LCP image. 
+It eager-loads `image`, `images` and `faqItems`, and includes `_components/<block type handle>.twig` for each block with `block` and `isFirst`. The first block uses `isFirst` to load its image eagerly, since it's usually the LCP image.
 
 **Headings:** every page gets exactly one `<h1>`. When the first block is a `pbHero`, its heading is the `<h1>`. Otherwise `pagebuilder.twig` outputs a visually hidden `<h1>` with the entry title (the site name on the homepage). A `pbHero` further down the page renders an `<h2>`. In `pbText` and `pbTextImage`, H1s from the editor are output as `<h2 data-h1>`, styled like an H1 by the `rich-text` utility. Block headings are `<h2>`.
 
@@ -137,6 +140,7 @@ To add a block: create a nested entry type, add it to the `pagebuilder` field, a
 **noindex:** a template can set `{% set noindex = true %}` to add `<meta name="robots" content="noindex">` and skip canonical, hreflang, `og:url` and JSON-LD.
 
 **Error pages:**
+
 - `404.twig` uses the normal layout and is set to noindex.
 - `503.twig` is shown when the system is offline (**Settings → General → System Status**) or while Craft is updating. It's deliberately standalone: no layout, globals or queries, because the database may be unavailable, and inline CSS because the Vite assets might not be reachable.
 - With dev mode on, Craft shows its debug error page instead. To check the designs, open `/404` and `/503` directly (they return status 200 there), or set `CRAFT_DEV_MODE=false`.
@@ -172,6 +176,7 @@ Use them in Twig with the `t` filter: `{{ 'Read more'|t }}`. Add each new key to
   - `src/js/video-player.js`: click-to-play for `pbVideo`
 
   For new behaviour, add a new file and import it in `app.js`. Templates have no inline JavaScript. The only `<script>` with content is the JSON-LD, which is data, not code. This keeps a strict Content Security Policy possible.
+
 - `src/js/gtm.js` is a separate Vite entry (see `vite.config.js`), loaded only when GTM is on.
 - `src/css/app.css` imports Tailwind 4 and scans `templates/**/*.{twig,html}` for classes. Tailwind is configured in this CSS file (`@theme`, `@source`), so there's no `tailwind.config.js`.
 - The production build goes to `web/dist/`, which git ignores.
@@ -183,7 +188,9 @@ GTM is loaded by `src/js/gtm.js`, which `_layouts/_layout.twig` includes with `a
 
 To send Web Vitals to GA4: in GTM, create a **Custom Event** trigger on `web_vitals`, plus a GA4 event tag that sends `metric_name`, `metric_value` and `metric_rating` as event parameters.
 
-> For Dutch and EU visitors, GTM and GA need visitor consent before they track anything (GDPR / AVG). Add a cookie banner with Google Consent Mode before setting `GTM_ID` on a live site.
+**Consent Mode v2:** before GTM loads, `gtm.js` sets every consent type to `denied` (only `security_storage` is `granted`) and turns on `ads_data_redaction`. Tags that respect consent, such as GA4 and Google Ads, don't store cookies until the visitor agrees. The defaults wait up to 500 ms (`wait_for_update`) for the cookie banner to send a stored choice.
+
+> For Dutch and EU visitors, GTM and GA need visitor consent before they track anything (GDPR / AVG). Add a cookie banner (CMP) that supports Google Consent Mode v2 before setting `GTM_ID` on a live site. The banner only needs to send `gtag('consent', 'update', { … })` with the visitor's choices, because the defaults are already set. In GTM, give non-Google tags (Meta, Hotjar, LinkedIn, …) a consent check under **Advanced settings → Consent settings**, because they don't read Consent Mode themselves.
 
 ### Editor settings
 
@@ -290,19 +297,19 @@ Craft serves it at `/robots.txt` as `text/plain`, because it picks the content t
 
 These plugins aren't included in the kickstart, except CKEditor. This list is for reference: install them per project as needed.
 
-| Purpose | Free | Paid |
-| --- | --- | --- |
-| Mailing | Postmark | – |
-| Forms | Contact Form + extensions | Formie, Freeform |
-| SEO | SEOMate | SEOmatic |
-| Mega menu | – | Navigation |
-| Translations | – | Multi Translator |
-| Cache | – | Blitz |
-| reCAPTCHA | Contact Form reCAPTCHA | – |
-| Redirects | Redirect Manager | Retour |
-| Cookie banner | – | – |
-| Content import | – | Feed Me |
-| Text editor | CKEditor (already installed) | – |
+| Purpose        | Free                         | Paid             |
+| -------------- | ---------------------------- | ---------------- |
+| Mailing        | Postmark                     | –                |
+| Forms          | Contact Form + extensions    | Formie, Freeform |
+| SEO            | SEOMate                      | SEOmatic         |
+| Mega menu      | –                            | Navigation       |
+| Translations   | –                            | Multi Translator |
+| Cache          | –                            | Blitz            |
+| reCAPTCHA      | Contact Form reCAPTCHA       | –                |
+| Redirects      | Redirect Manager             | Retour           |
+| Cookie banner  | –                            | –                |
+| Content import | –                            | Feed Me          |
+| Text editor    | CKEditor (already installed) | –                |
 
 For setting up SEOmatic or SEOMate, see [robots.txt and sitemap (SEO plugin)](#robotstxt-and-sitemap-seo-plugin).
 
@@ -331,14 +338,14 @@ rm -f .env                                       # It's created again in step 4
 
 ### 3. Rename the project
 
-| File | What to change |
-| --- | --- |
-| `.ddev/config.yaml` | `name: CraftCMStest` → `name: my-project` |
-| `vite.config.js` | `"craftcmstest.ddev.site"` in `allowedHosts` → `"my-project.ddev.site"` |
-| `package.json` | `"name": "craftcmstest"` → `"name": "my-project"` |
-| `templates/_partials/header.twig` | Logo mark and "Kickstart" name (nav lists the first 5 **Pages** entries) |
-| `templates/_partials/footer.twig` | Logo, "Kickstart" name, tagline and copyright |
-| Control panel: **Settings → General** | System name (used in the page `<title>`) and the email settings |
+| File                                  | What to change                                                           |
+| ------------------------------------- | ------------------------------------------------------------------------ |
+| `.ddev/config.yaml`                   | `name: kickstart` → `name: my-project`                                   |
+| `vite.config.js`                      | `"kickstart.ddev.site"` in `allowedHosts` → `"my-project.ddev.site"`     |
+| `package.json`                        | `"name": "kickstart"` → `"name": "my-project"`                           |
+| `templates/_partials/header.twig`     | Logo mark and "Kickstart" name (nav lists the first 5 **Pages** entries) |
+| `templates/_partials/footer.twig`     | Logo, "Kickstart" name, tagline and copyright                            |
+| Control panel: **Settings → General** | System name (used in the page `<title>`) and the email settings          |
 
 ### 4. Create the `.env` file
 
@@ -397,16 +404,16 @@ Put screenshots, logos and other reference files in `docs/brief-assets/`. Each b
 
 ## Everyday commands
 
-| Task | Command |
-| --- | --- |
-| Start / stop the project | `ddev start` / `ddev stop` |
-| Run a Craft command | `ddev craft <command>` |
-| Apply project config changes | `ddev craft up` |
-| Build front-end assets for production | `ddev npm run build` |
-| Export the database | `ddev export-db --file=db.sql.gz` |
-| Import a database | `ddev import-db --file=db.sql.gz` |
-| Take a database snapshot (before big changes) | `ddev snapshot --name=<name>` |
-| Restore a snapshot | `ddev snapshot restore <name>` |
+| Task                                          | Command                           |
+| --------------------------------------------- | --------------------------------- |
+| Start / stop the project                      | `ddev start` / `ddev stop`        |
+| Run a Craft command                           | `ddev craft <command>`            |
+| Apply project config changes                  | `ddev craft up`                   |
+| Build front-end assets for production         | `ddev npm run build`              |
+| Export the database                           | `ddev export-db --file=db.sql.gz` |
+| Import a database                             | `ddev import-db --file=db.sql.gz` |
+| Take a database snapshot (before big changes) | `ddev snapshot --name=<name>`     |
+| Restore a snapshot                            | `ddev snapshot restore <name>`    |
 
 ---
 
@@ -418,7 +425,9 @@ Put screenshots, logos and other reference files in `docs/brief-assets/`. Each b
    - Fill in the app ID, security key and site URLs.
    - Set `GTM_ID` if the site uses GTM.
 2. Run `composer install --no-dev`.
-3. Run `npm ci && npm run build`.
-4. Run `php craft up`.
+3. Run `npm ci && npm run build` with the Node version from `.nvmrc` (`nvm use`).
+4. Run `php craft db/backup --zip`, then `php craft up`.
+
+The GitHub Actions deploy (`.github/workflows/ci.yml`) does steps 2 to 4 for you. Before every `craft up`, it saves a zipped database backup to `storage/backups/` and keeps the 10 most recent. To roll back a failed migration, run `php craft db/restore storage/backups/<file>.zip`.
 
 Uploads (`web/uploads/`) and the database aren't stored in git. Move them between environments separately.

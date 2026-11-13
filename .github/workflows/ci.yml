@@ -19,7 +19,8 @@
 #     DEPLOY_PATH        Project root on the server (the folder that contains `craft`)
 #
 # The server keeps its own .env, storage/ and web/uploads/: the deploy never touches them.
-# PHP and Node.js versions match .ddev/config.yaml. Keep them in sync (and with the server).
+# The Node.js version comes from .nvmrc, which DDEV also reads.
+# The PHP version matches .ddev/config.yaml. Keep it in sync (and with the server).
 
 name: CI
 
@@ -39,7 +40,6 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "24"
   PHP_VERSION: "8.4"
 
 jobs:
@@ -52,7 +52,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
@@ -142,6 +142,17 @@ jobs:
           --exclude=.env --exclude=/storage/ --exclude=/config/license.key
           --exclude=/web/uploads/ --exclude=/web/cpresources/
           ./ "$SSH_TARGET"
+
+      # Zipped dump in storage/backups/ (never touched by the deploy), so a failed migration can be rolled back
+      # with `php craft db/restore <file>`. Only the 10 most recent backups are kept.
+      - name: Back up database
+        env:
+          SSH_TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: >-
+          ssh -i ~/.ssh/id_deploy "$SSH_TARGET"
+          "cd '$DEPLOY_PATH' && php craft db/backup --zip --interactive=0
+          && ls -1t storage/backups/*.zip | tail -n +11 | xargs -r rm --"
 
       - name: Run craft up
         env:

@@ -25,6 +25,18 @@ return GeneralConfig::create()
     ->loginPath(false)
     // Enable the Twig sandbox for system messages, etc.
     ->enableTwigSandbox()
+    // Don't send the "X-Powered-By: Craft CMS" header (makes the CMS a little harder to fingerprint)
+    ->sendPoweredByHeader(false)
+    // Turn off the GraphQL API. Set to true in projects that need it.
+    ->enableGql(false)
+    // Keep at most 25 revisions per entry, so the database doesn't keep growing
+    ->maxRevisions(25)
+    // Convert uploaded filenames to ASCII (e.g. "café.jpg" → "cafe.jpg") for clean, predictable URLs
+    ->convertFilenamesToAscii()
+    // Never make image transforms larger than the original image
+    ->upscaleImages(false)
+    // Add a version query string (?v=…) to asset URLs, so replaced files bypass browser/CDN caches
+    ->revAssetUrls()
     // Allow admin changes in development
     ->allowAdminChanges(App::env('CRAFT_ALLOW_ADMIN_CHANGES') ?? false)
     // Enable dev mode in development

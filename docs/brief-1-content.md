@@ -38,9 +38,9 @@ Styling is **not** part of this brief. That comes afterwards in [brief-2-style.m
 | System name (**Settings → General**, used in `<title>`)       | `Craft Test CMS`       |              |
 | Company name (Globals → Site settings, logo text & copyright) | `Kickstart` (fallback) |              |
 | Time zone                                                     | `Europe/Amsterdam`     |              |
-| Email "from" name                                             | `craftcmstest`         |              |
+| Email "from" name                                             | `kickstart`            |              |
 | Email "from" address                                          | `admin@wakkr.com`      |              |
-| Site group name                                               | `craftcmstest`         |              |
+| Site group name                                               | `kickstart`            |              |
 
 **Plugins** (see "Plugins we normally use" in the README). Tick what this project needs:
 
